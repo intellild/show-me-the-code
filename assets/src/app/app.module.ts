@@ -2,12 +2,10 @@ import { OverlayModule } from "@angular/cdk/overlay";
 import { PortalModule } from "@angular/cdk/portal";
 import { NgModule } from '@angular/core';
 import { FormsModule } from "@angular/forms";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatToolbarModule } from "@angular/material/toolbar";
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgSelectModule } from '@ng-select/ng-select';
+import { MobxAngularModule } from "mobx-angular";
+import { InputComponent } from "../controls/input.component";
 
 import { AppComponent } from './app.component';
 import { EditorDirective } from "./editor.directive";
@@ -18,6 +16,7 @@ import { PreferenceComponent } from "./preference.component";
   declarations: [
     AppComponent,
     EditorDirective,
+    InputComponent,
     PreferenceComponent,
     PreferencePopupComponent,
   ],
@@ -25,10 +24,7 @@ import { PreferenceComponent } from "./preference.component";
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    MatButtonModule,
-    MatCardModule,
-    MatToolbarModule,
-    NgSelectModule,
+    MobxAngularModule,
     OverlayModule,
     PortalModule,
   ],

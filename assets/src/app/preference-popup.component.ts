@@ -6,11 +6,7 @@ import { map, startWith } from "rxjs/operators";
 @Component({
   selector: 'preference-popup',
   template: `
-    <mat-card class="container">
-      <ng-select [items]="simpleItems"
-                 [(ngModel)]="selectedSimpleItem">
-      </ng-select>
-    </mat-card>
+
   `,
   styles: [
     `

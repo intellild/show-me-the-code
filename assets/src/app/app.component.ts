@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, HostBinding } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   template: `
-    <mat-toolbar class="top-toolbar">
+    <div class="toolbar">
       <preference></preference>
-    </mat-toolbar>
+
+      <app-input *mobxAutorun></app-input>
+    </div>
     <div class="editor" monaco-editor></div>
   `,
   styles: [
@@ -19,8 +21,12 @@ import { Component } from '@angular/core';
         grid-template-columns: minmax(0, 1fr) 38.2%;
       }
 
-      .top-toolbar {
+      .toolbar {
         grid-area: header;
+        background: #212121;
+        color: #fff;
+        display: flex;
+        align-items: center;
       }
 
       .editor {
@@ -29,4 +35,10 @@ import { Component } from '@angular/core';
     `,
   ],
 })
-export class AppComponent {}
+export class AppComponent {
+  @HostBinding('class.monaco-workbench')
+  workbench = true;
+
+  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {
+  }
+}
