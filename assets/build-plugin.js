@@ -20,16 +20,16 @@ exports.default = {
     cfg.node.module = 'empty';
 
     // workaround for https://github.com/angular/angular-cli/issues/14033
-    const loader = cfg.module.rules.find(
-      rule => rule.use && rule.use.find(it => it.loader === '@angular-devkit/build-optimizer/webpack-loader'),
-    );
-    if (loader) {
-      const originalTest = loader.test;
-      loader.test = file => {
-        const isMonaco = !!file.match('node_modules/monaco-editor');
-        return !isMonaco && !!file.match(originalTest);
-      };
-    }
+    // const loader = cfg.module.rules.find(
+    //   rule => rule.use && rule.use.find(it => it.loader === '@angular-devkit/build-optimizer/webpack-loader'),
+    // );
+    // if (loader) {
+    //   const originalTest = loader.test;
+    //   loader.test = file => {
+    //     const isMonaco = !!file.match('node_modules/monaco-editor');
+    //     return !isMonaco && !!file.match(originalTest);
+    //   };
+    // }
 
     cfg.resolve.extensions.push('.bs.js', '.proto.js');
 
