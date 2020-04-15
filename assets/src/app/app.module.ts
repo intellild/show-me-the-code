@@ -6,10 +6,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MobxAngularModule } from "mobx-angular";
 import { InputComponent } from "../controls/input.component";
+import { SelectComponent } from "../controls/select.component";
 
 import { AppComponent } from './app.component';
 import { EditorDirective } from "./editor.directive";
-import { PreferencePopupComponent } from "./preference-popup.component";
 import { PreferenceComponent } from "./preference.component";
 
 @NgModule({
@@ -18,7 +18,7 @@ import { PreferenceComponent } from "./preference.component";
     EditorDirective,
     InputComponent,
     PreferenceComponent,
-    PreferencePopupComponent,
+    SelectComponent,
   ],
   imports: [
     BrowserModule,

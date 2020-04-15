@@ -1,17 +1,21 @@
-import { FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { PreferencePopupComponent } from './preference-popup.component';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from "@angular/cdk/portal";
+import { ChangeDetectorRef, Component, ElementRef, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
   selector: 'preference',
   template: `
-    <button #anchor color="accent" mat-stroked-button mat-flat-button (click)="showPopup()">
+    <div (click)="showPopup()">
       <svg height="24" width="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0V0z" fill="none" />
         <path d="M2 16v2h20v-2H2zm0-5v2h20v-2H2zm0-5v2h20V6H2z" />
       </svg>
-    </button>
+    </div>
+    <ng-template #templateRef>
+      <div>
+
+      </div>
+    </ng-template>
   `,
   styles: [
     `
@@ -31,53 +35,54 @@ import { PreferencePopupComponent } from './preference-popup.component';
   ],
 })
 export class PreferenceComponent {
-  private readonly portal = new ComponentPortal(PreferencePopupComponent);
   private overlayRef: OverlayRef | null = null;
-  @ViewChild('anchor', { static: true, read: ElementRef })
-  buttonRef: ElementRef<HTMLButtonElement>;
+
+  @ViewChild('templateRef', { static: true })
+  templateRef: TemplateRef<any>;
 
   constructor(
-    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly viewContainerRef: ViewContainerRef,
     private readonly overlay: Overlay) {}
 
   showPopup() {
     if (this.overlayRef) {
       return;
     }
-    this.overlayRef = this.overlay.create(
-      new OverlayConfig({
-        hasBackdrop: true,
-        backdropClass: 'transparent',
-        positionStrategy: this.overlay
-          .position()
-          .flexibleConnectedTo(this.buttonRef)
-          .withPositions([
-            {
-              offsetY: 10,
-              overlayX: 'start',
-              overlayY: 'top',
-              originX: 'start',
-              originY: 'bottom',
-            },
-          ]),
-      }),
-
-    );
-    this.overlayRef.attach(this.portal);
-    this.overlayRef.updatePosition();
-    const $ = this.overlayRef.backdropClick().subscribe(() => {
-      $.unsubscribe();
-      this.hidePopup();
-    });
-    this.changeDetectorRef.detectChanges();
+    const portal = new TemplatePortal(this.templateRef, this.viewContainerRef);
+    // this.overlayRef = this.overlay.create(
+    //   new OverlayConfig({
+    //     hasBackdrop: true,
+    //     backdropClass: 'transparent',
+    //     positionStrategy: this.overlay
+    //       .position()
+    //       .flexibleConnectedTo(this.buttonRef)
+    //       .withPositions([
+    //         {
+    //           offsetY: 10,
+    //           overlayX: 'start',
+    //           overlayY: 'top',
+    //           originX: 'start',
+    //           originY: 'bottom',
+    //         },
+    //       ]),
+    //   }),
+    //
+    // );
+    // this.overlayRef.attach(this.portal);
+    // this.overlayRef.updatePosition();
+    // const $ = this.overlayRef.backdropClick().subscribe(() => {
+    //   $.unsubscribe();
+    //   this.hidePopup();
+    // });
+    // this.changeDetectorRef.detectChanges();
   }
 
   hidePopup() {
     if (!this.overlayRef) {
       return;
     }
-    this.overlayRef.detach();
-    this.overlayRef.dispose();
-    this.overlayRef = null;
+    // this.overlayRef.detach();
+    // this.overlayRef.dispose();
+    // this.overlayRef = null;
   }
 }

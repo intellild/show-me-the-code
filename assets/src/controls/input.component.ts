@@ -1,4 +1,13 @@
-import { ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component, ElementRef,
+  EventEmitter,
+  HostBinding,
+  Input,
+  Output,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { observable } from 'mobx-angular';
 
 @Component({
@@ -6,6 +15,7 @@ import { observable } from 'mobx-angular';
   template: `
     <div class="wrapper">
       <input
+        #input
         class="input"
         spellcheck="false"
         [placeholder]="placeholder"
@@ -14,6 +24,7 @@ import { observable } from 'mobx-angular';
         [value]="value"
         (input)="onInput($event)"
       />
+      <ng-container *ngIf="icon" [ngTemplateOutlet]="icon"></ng-container>
     </div>
   `,
   styles: [
@@ -24,20 +35,23 @@ import { observable } from 'mobx-angular';
         color: rgb(204, 204, 204);
       }
 
+      .wrapper {
+        display: flex;
+        align-items: center;
+      }
+
       .input {
         background-color: rgb(60, 60, 60);
         color: rgb(204, 204, 204);
         height: 24px;
       }
-
-      :host.synthetic-focus {
-        outline: rgba(14, 99, 156, 0.8) solid 1px;
-        outline-offset: -1px;
-      }
     `,
   ],
 })
 export class InputComponent {
+  @ViewChild('input', { static: true, read: ElementRef })
+  inputRef: ElementRef<HTMLInputElement>;
+
   @Input()
   placeholder = '';
 
@@ -49,7 +63,7 @@ export class InputComponent {
 
   @observable
   @HostBinding('class.synthetic-focus')
-  focus = false;
+  focused = false;
 
   @Output('focus')
   focusEvent = new EventEmitter<FocusEvent>();
@@ -63,19 +77,28 @@ export class InputComponent {
   @Output()
   valueChange = new EventEmitter<string>();
 
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
+  @Input()
+  icon: TemplateRef<any>;
 
   onFocus(e: FocusEvent) {
-    this.focus = true;
+    this.focused = true;
     this.focusEvent.emit(e);
   }
 
   onBlur(e: FocusEvent) {
-    this.focus = false;
+    this.focused = false;
     this.blurEvent.emit(e);
   }
 
   onInput(e: Event) {
     this.valueChange.emit((e.currentTarget as HTMLInputElement).value);
+  }
+
+  focus() {
+    this.inputRef.nativeElement?.focus();
+  }
+
+  blur() {
+    this.inputRef.nativeElement?.blur();
   }
 }

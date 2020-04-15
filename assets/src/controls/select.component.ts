@@ -1,0 +1,173 @@
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
+import { computed, observable } from 'mobx-angular';
+import { InputComponent } from "./input.component";
+
+export interface ISelectOption {
+  value: string;
+  text: string;
+}
+
+@Component({
+  selector: 'app-select',
+  template: `
+    <app-input
+      #input
+      *mobxAutorun
+      [placeholder]="text"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onKeydown($event)"
+      [(value)]="keyword"
+    ></app-input>
+    <ng-template #popup>
+      <div *mobxAutorun class="options synthetic-focus" (mouseleave)="active = null">
+        <div
+          *ngFor="let option of options; let index = index; trackBy: optionsTrackBy"
+          class="item"
+          [class.active]="active !== null ? option.value === options[active].value : false"
+          (mouseover)="active = index"
+          (click)="onItemClick($event, option)"
+        >
+          {{ option.text }}
+        </div>
+      </div>
+    </ng-template>
+  `,
+  styles: [
+    `
+      :host {
+        position: relative;
+        overflow: visible;
+      }
+
+      .options {
+        width: 100%;
+        box-sizing: border-box;
+        background-color: rgb(60, 60, 60);
+      }
+
+      .item {
+        height: 18px;
+        display: flex;
+        align-items: center;
+        color: rgb(204, 204, 204);
+      }
+
+      .item:hover,
+      .item.active {
+        background-color: #062f4a !important;
+      }
+    `,
+  ],
+})
+export class SelectComponent {
+  private overlayRef: OverlayRef | null = null;
+
+  @ViewChild('input', { static: true, read: ElementRef })
+  inputRef: ElementRef<InputComponent>;
+
+  @observable
+  active: number | null = null;
+
+  @ViewChild('popup', { static: true })
+  optionsTemplateRef: TemplateRef<any>;
+
+  @Input()
+  options: ISelectOption[] = [];
+
+  @observable
+  @Input()
+  value = '';
+
+  @Output()
+  valueChange = new EventEmitter<string>();
+
+  @observable
+  keyword = '';
+
+  @computed
+  get text(): string {
+    const option = this.options.find((it) => it.value === this.value);
+    return option?.text ?? '';
+  }
+
+  constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {}
+
+  optionsTrackBy(index: number, option: ISelectOption) {
+    return option.value;
+  }
+
+  onFocus() {
+    this.showOptions();
+    this.keyword = '';
+  }
+
+  onBlur() {
+    // this.hideOptions();
+    this.keyword = this.text;
+  }
+
+  showOptions() {
+    if (this.overlayRef) {
+      return;
+    }
+    const portal = new TemplatePortal(this.optionsTemplateRef, this.viewContainerRef);
+    console.log(this.viewContainerRef.element.nativeElement.getBoundingClientRect());
+    this.overlayRef = this.overlay.create({
+      width: this.viewContainerRef.element.nativeElement.getBoundingClientRect().width,
+      positionStrategy: this.overlay
+        .position()
+        .flexibleConnectedTo(this.viewContainerRef.element)
+        .withPositions([
+          {
+            originX: 'start',
+            originY: 'bottom',
+            overlayX: 'start',
+            overlayY: 'top',
+          },
+        ]),
+    });
+    this.overlayRef.attach(portal);
+    this.overlayRef.updatePosition();
+  }
+
+  hideOptions() {
+    if (this.overlayRef) {
+      this.overlayRef.detach();
+      this.overlayRef.dispose();
+      this.overlayRef = null;
+    }
+  }
+
+  onKeydown(e: KeyboardEvent) {
+    if (!this.options.length) {
+      this.active = null;
+      return;
+    }
+    switch (e.key) {
+      case 'ArrowUp':
+        this.active = this.active === null ? this.options.length - 1 : this.active > 0 ? this.active - 1 : null;
+        break;
+      case 'ArrowDown':
+        this.active = this.active === null ? 0 : (this.active + 1) % this.options.length;
+        break;
+    }
+  }
+
+  onItemClick(e: MouseEvent, option: ISelectOption) {
+    e.preventDefault();
+    this.valueChange.emit(option.value);
+    this.inputRef.nativeElement?.focus();
+  }
+}

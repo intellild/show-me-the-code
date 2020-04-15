@@ -1,5 +1,9 @@
+@import '~@angular/cdk/overlay-prebuilt.css';
+
 body {
   margin: 0;
+  overflow: hidden;
+  font-family: Segoe WPC,Segoe UI,sans-serif;
 }
 
 app-root {
@@ -9,4 +13,10 @@ app-root {
 
 .transparent {
   background: transparent;
+}
+
+
+.synthetic-focus {
+  outline: rgba(14, 99, 156, 0.8) solid 1px;
+  outline-offset: -1px;
 }
