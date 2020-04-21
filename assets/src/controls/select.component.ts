@@ -2,16 +2,19 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
+  ComponentRef,
   ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   Output,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { observe } from 'mobx';
 import { computed, observable } from 'mobx-angular';
-import { InputComponent } from "./input.component";
+import { InputComponent } from './input.component';
 
 export interface ISelectOption {
   value: string;
@@ -33,11 +36,11 @@ export interface ISelectOption {
     <ng-template #popup>
       <div *mobxAutorun class="options synthetic-focus" (mouseleave)="active = null">
         <div
-          *ngFor="let option of options; let index = index; trackBy: optionsTrackBy"
+          *ngFor="let option of items; let index = index; trackBy: optionsTrackBy"
           class="item"
           [class.active]="active !== null ? option.value === options[active].value : false"
           (mouseover)="active = index"
-          (click)="onItemClick($event, option)"
+          (mousedown)="onItemClick($event, option)"
         >
           {{ option.text }}
         </div>
@@ -62,6 +65,7 @@ export interface ISelectOption {
         display: flex;
         align-items: center;
         color: rgb(204, 204, 204);
+        padding: 0 5px;
       }
 
       .item:hover,
@@ -71,11 +75,11 @@ export interface ISelectOption {
     `,
   ],
 })
-export class SelectComponent {
+export class SelectComponent implements OnDestroy {
   private overlayRef: OverlayRef | null = null;
 
-  @ViewChild('input', { static: true, read: ElementRef })
-  inputRef: ElementRef<InputComponent>;
+  @ViewChild('input')
+  inputRef: InputComponent;
 
   @observable
   active: number | null = null;
@@ -102,7 +106,29 @@ export class SelectComponent {
     return option?.text ?? '';
   }
 
-  constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {}
+  @computed
+  get items(): ISelectOption[] {
+    if (!this.keyword) {
+      return this.options;
+    }
+    const search = this.keyword.toLowerCase();
+    return this.options.filter((it) => it.text.includes(search) || it.value.includes(search));
+  }
+
+  private disposers: (() => void)[] = [];
+
+  constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {
+    this.disposers.push(
+      observe(
+        this,
+        'value',
+        () => {
+          this.keyword = this.text;
+        },
+        false,
+      ),
+    );
+  }
 
   optionsTrackBy(index: number, option: ISelectOption) {
     return option.value;
@@ -114,8 +140,8 @@ export class SelectComponent {
   }
 
   onBlur() {
-    // this.hideOptions();
     this.keyword = this.text;
+    this.hideOptions();
   }
 
   showOptions() {
@@ -123,7 +149,6 @@ export class SelectComponent {
       return;
     }
     const portal = new TemplatePortal(this.optionsTemplateRef, this.viewContainerRef);
-    console.log(this.viewContainerRef.element.nativeElement.getBoundingClientRect());
     this.overlayRef = this.overlay.create({
       width: this.viewContainerRef.element.nativeElement.getBoundingClientRect().width,
       positionStrategy: this.overlay
@@ -168,6 +193,10 @@ export class SelectComponent {
   onItemClick(e: MouseEvent, option: ISelectOption) {
     e.preventDefault();
     this.valueChange.emit(option.value);
-    this.inputRef.nativeElement?.focus();
+    this.inputRef?.blur();
+  }
+
+  ngOnDestroy(): void {
+    this.disposers.forEach((disposer) => disposer());
   }
 }

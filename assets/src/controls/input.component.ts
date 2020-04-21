@@ -1,13 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component, ElementRef,
-  EventEmitter,
-  HostBinding,
-  Input,
-  Output,
-  TemplateRef,
-  ViewChild
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, TemplateRef, ViewChild } from '@angular/core';
 import { observable } from 'mobx-angular';
 
 @Component({
