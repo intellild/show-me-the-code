@@ -1,6 +1,8 @@
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from "@angular/cdk/portal";
-import { ChangeDetectorRef, Component, ElementRef, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { TemplatePortal } from '@angular/cdk/portal';
+import { Component, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { observable } from 'mobx-angular';
 
 @Component({
   selector: 'preference',
@@ -12,9 +14,7 @@ import { ChangeDetectorRef, Component, ElementRef, TemplateRef, ViewChild, ViewC
       </svg>
     </div>
     <ng-template #templateRef>
-      <div>
-
-      </div>
+      <div [@draw]="state" [@draw.done]="animationFinished()" class="container">hello</div>
     </ng-template>
   `,
   styles: [
@@ -24,14 +24,36 @@ import { ChangeDetectorRef, Component, ElementRef, TemplateRef, ViewChild, ViewC
         min-width: 0;
       }
 
-      :host ::ng-deep .mat-button-wrapper {
-        display: flex;
-        width: 40px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
+      .container {
+        width: 500px;
+        height: 100%;
+        background: red;
       }
     `,
+  ],
+  animations: [
+    trigger('draw', [
+      state(
+        'open',
+        style({
+          transform: 'translateX(0)',
+        }),
+      ),
+      state(
+        'closing',
+        style({
+          transform: 'translateX(-100%)',
+        }),
+      ),
+      state(
+        'closed',
+        style({
+          transform: 'translateX(-100%)',
+        }),
+      ),
+      transition('open => close', [animate('0.3s')]),
+      transition('close => open', [animate('0.3s')]),
+    ]),
   ],
 })
 export class PreferenceComponent {
@@ -40,49 +62,40 @@ export class PreferenceComponent {
   @ViewChild('templateRef', { static: true })
   templateRef: TemplateRef<any>;
 
-  constructor(
-    private readonly viewContainerRef: ViewContainerRef,
-    private readonly overlay: Overlay) {}
+  @observable
+  state: 'open' | 'closing' | 'closed' = 'closed';
+
+  constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {}
 
   showPopup() {
     if (this.overlayRef) {
       return;
     }
     const portal = new TemplatePortal(this.templateRef, this.viewContainerRef);
-    // this.overlayRef = this.overlay.create(
-    //   new OverlayConfig({
-    //     hasBackdrop: true,
-    //     backdropClass: 'transparent',
-    //     positionStrategy: this.overlay
-    //       .position()
-    //       .flexibleConnectedTo(this.buttonRef)
-    //       .withPositions([
-    //         {
-    //           offsetY: 10,
-    //           overlayX: 'start',
-    //           overlayY: 'top',
-    //           originX: 'start',
-    //           originY: 'bottom',
-    //         },
-    //       ]),
-    //   }),
-    //
-    // );
-    // this.overlayRef.attach(this.portal);
-    // this.overlayRef.updatePosition();
-    // const $ = this.overlayRef.backdropClick().subscribe(() => {
-    //   $.unsubscribe();
-    //   this.hidePopup();
-    // });
-    // this.changeDetectorRef.detectChanges();
+    this.overlayRef = this.overlay.create({
+      hasBackdrop: true,
+      height: '100%',
+      positionStrategy: this.overlay.position().global().bottom('0').left('0').top('0'),
+    });
+    const $ = this.overlayRef.backdropClick().subscribe(() => {
+      $.unsubscribe();
+      this.hidePopup();
+    });
+    this.overlayRef.attach(portal);
+    this.overlayRef.updatePosition();
+    this.state = 'open';
   }
 
   hidePopup() {
-    if (!this.overlayRef) {
+    this.state = 'closing';
+  }
+
+  animationFinished() {
+    if (this.state === 'open' || !this.overlayRef) {
       return;
     }
-    // this.overlayRef.detach();
-    // this.overlayRef.dispose();
-    // this.overlayRef = null;
+    this.overlayRef.detach();
+    this.overlayRef.dispose();
+    this.overlayRef = null;
   }
 }

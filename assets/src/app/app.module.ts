@@ -1,34 +1,16 @@
-import { OverlayModule } from "@angular/cdk/overlay";
-import { PortalModule } from "@angular/cdk/portal";
 import { NgModule } from '@angular/core';
-import { FormsModule } from "@angular/forms";
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MobxAngularModule } from "mobx-angular";
-import { InputComponent } from "../controls/input.component";
-import { SelectComponent } from "../controls/select.component";
+import { MobxAngularModule } from 'mobx-angular';
+import { ControlsModule } from '../controls/controls.module';
 
 import { AppComponent } from './app.component';
-import { EditorDirective } from "./editor.directive";
-import { PreferenceComponent } from "./preference.component";
+import { PreferenceComponent } from './preference.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    EditorDirective,
-    InputComponent,
-    PreferenceComponent,
-    SelectComponent,
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    MobxAngularModule,
-    OverlayModule,
-    PortalModule,
-  ],
+  declarations: [AppComponent, PreferenceComponent],
+  imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

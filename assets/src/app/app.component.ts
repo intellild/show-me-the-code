@@ -1,13 +1,10 @@
-import { ChangeDetectorRef, Component, HostBinding } from '@angular/core';
-import { ISelectOption } from '../controls/select.component';
+import { Component, HostBinding } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   template: `
-    <div class="toolbar">
+    <div *mobxAutorun class="toolbar">
       <preference></preference>
-
-      <app-select *mobxAutorun [options]="options"></app-select>
     </div>
     <div class="editor" monaco-editor></div>
   `,
@@ -39,29 +36,4 @@ import { ISelectOption } from '../controls/select.component';
 export class AppComponent {
   @HostBinding('class.monaco-workbench')
   workbench = true;
-
-  options: ISelectOption[] = [
-    { value: 'typescript', text: 'TypeScript' },
-    { value: 'javascript', text: 'JavaScript' },
-    { value: 'rust', text: 'Rust' },
-    { value: 'c', text: 'C' },
-    { value: 'cpp', text: 'C++' },
-    { value: 'csharp', text: 'C#' },
-    { value: 'css', text: 'CSS' },
-    { value: 'fsharp', text: 'F#' },
-    { value: 'java', text: 'Java' },
-    { value: 'json', text: 'JSON' },
-    { value: 'less', text: 'Less' },
-    { value: 'lua', text: 'Lua' },
-    { value: 'objective-c', text: 'Objective C' },
-    { value: 'plaintext', text: 'Plain Text' },
-    { value: 'powershell', text: 'PowerShell' },
-    { value: 'ruby', text: 'Ruby' },
-    { value: 'scss', text: 'Scss' },
-    { value: 'sql', text: 'SQL' },
-    { value: 'swift', text: 'Swift' },
-    { value: 'vb', text: 'Visual Basic' },
-  ];
-
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
 }
