@@ -1,4 +1,4 @@
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
@@ -149,20 +149,22 @@ export class SelectComponent implements OnDestroy {
       return;
     }
     const portal = new TemplatePortal(this.optionsTemplateRef, this.viewContainerRef);
-    this.overlayRef = this.overlay.create({
-      width: this.viewContainerRef.element.nativeElement.getBoundingClientRect().width,
-      positionStrategy: this.overlay
-        .position()
-        .flexibleConnectedTo(this.viewContainerRef.element)
-        .withPositions([
-          {
-            originX: 'start',
-            originY: 'bottom',
-            overlayX: 'start',
-            overlayY: 'top',
-          },
-        ]),
-    });
+    this.overlayRef = this.overlay.create(
+      new OverlayConfig({
+        width: this.viewContainerRef.element.nativeElement.getBoundingClientRect().width,
+        positionStrategy: this.overlay
+          .position()
+          .flexibleConnectedTo(this.viewContainerRef.element)
+          .withPositions([
+            {
+              originX: 'start',
+              originY: 'bottom',
+              overlayX: 'start',
+              overlayY: 'top',
+            },
+          ]),
+      }),
+    );
     this.overlayRef.attach(portal);
     this.overlayRef.updatePosition();
   }
