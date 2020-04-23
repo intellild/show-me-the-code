@@ -151,5 +151,5 @@ lib/bs
 .bsb.lock
 *.iml
 *.proto.js
-client/serializers/index.d.ts
+assets/src/serializers/index.d.ts
 .merlin

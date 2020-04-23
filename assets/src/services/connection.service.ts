@@ -1,11 +1,10 @@
 import { Socket, Channel, Presence } from 'phoenix';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { MessageService } from 'primeng/components/common/messageservice';
-import EventEmitter from 'eventemitter3';
-import { IUser } from '../models';
-import { post } from './ajax';
-import { linkEvents, unlinkEvents } from './utils';
+import * as EventEmitter from 'eventemitter3';
+import { IUser } from '../../../client/models';
+import { post } from '../../../client/app/ajax';
+import { linkEvents, unlinkEvents } from '../../../client/app/utils';
 
 declare const process: any;
 
@@ -47,25 +46,25 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   username = '';
   userId = '';
 
-  on!: <K extends keyof ISocketEvents>(
+  declare on: <K extends keyof ISocketEvents>(
     this: this,
     event: K,
     cb: (message: ISocketEvents[K], context?: any) => void,
   ) => this;
-  off!: <K extends keyof ISocketEvents>(
+  declare off: <K extends keyof ISocketEvents>(
     this: this,
     event: K,
     cb: (message: ISocketEvents[K], context?: any) => void,
   ) => this;
 
-  constructor(private readonly messageService: MessageService) {
+  constructor() {
     super();
     this.on('sync.full', () => this.synchronized$.next(true));
   }
 
   create(username: string): Promise<void> {
     this.username = username;
-    return post<string>(`${DOMAIN}/api/create-one`).then(roomId => this.join(roomId, username));
+    return post<string>(`${DOMAIN}/api/create-one`).then((roomId) => this.join(roomId, username));
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {
@@ -111,7 +110,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
         this.userMap.set(user.id, user);
       }
     });
-    presence.onLeave(userId => this.emit('user.leave', { userId }));
+    presence.onLeave((userId) => this.emit('user.leave', { userId }));
     return new Promise<void>((resolve, reject) => {
       channel
         .join()
@@ -122,7 +121,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
           this.channel$.next(channel);
           resolve();
         })
-        .receive('error', msg => this.handleJoinError(msg, links, channel, reject));
+        .receive('error', (msg) => this.handleJoinError(msg, links, channel, reject));
     });
   }
 
@@ -173,11 +172,11 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
       default:
         break;
     }
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Join fail',
-      detail: msg,
-    });
+    // this.messageService.add({
+    //   severity: 'error',
+    //   summary: 'Join fail',
+    //   detail: msg,
+    // });
     if (leave) {
       channel.leave();
       this.channel$.next(null);

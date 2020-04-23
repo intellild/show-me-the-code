@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import * as monaco from 'monaco-editor';
 import { Subject } from 'rxjs';
-import { EditorService } from './editor.service';
+import { EditorService } from '../../../client/app/editor.service';
 import { ConnectionService, ISocketEvents } from './connection.service';
 import { Proto } from '../serializers';
-import { decodeArrayBuffer, encodeArrayBuffer } from './utils';
+import { decodeArrayBuffer, encodeArrayBuffer } from '../../../client/app/utils';
 import { MessageService } from 'primeng/api';
 import { debounceTime } from 'rxjs/operators';
 
