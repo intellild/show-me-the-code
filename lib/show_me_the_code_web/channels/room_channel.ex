@@ -28,7 +28,7 @@ defmodule ShowMeTheCodeWeb.RoomChannel do
       Watcher.monitor(socket)
       user = User.from_socket(socket)
       send(self(), {:after_join, user, room})
-      {:ok, %{userId: user.id}, socket}
+      {:ok, socket}
     catch
       :invalid_room_id -> {:error, %{:reason => "invalid room id"}}
       :room_not_exist -> {:error, %{:reason => "room not exist"}}

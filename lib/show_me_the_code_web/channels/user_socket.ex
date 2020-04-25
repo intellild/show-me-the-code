@@ -3,7 +3,7 @@ defmodule ShowMeTheCodeWeb.UserSocket do
 
   ## Channels
   channel "room:*", ShowMeTheCodeWeb.RoomChannel
-  channel "user_private:*", ShowMeTheCodeWeb.UserChannel
+  channel "user:*", ShowMeTheCodeWeb.UserChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -16,8 +16,11 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"username" => username}, socket, _connect_info) when is_bitstring(username) do
-    socket = socket |> assign(:id, UUID.uuid4()) |> assign(:username, username)
+  def connect(%{"token" => token}, socket, _connect_info) when is_bitstring(token) do
+    socket = socket
+             |> assign(:id, UUID.uuid4())
+             |> assign(:user_id, token)
+             |> assign(:username, token)
     {:ok, socket}
   end
 
@@ -31,5 +34,5 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   #     ShowMeTheCodeWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(socket), do: "user_socket:#{socket.assigns.id}"
+  def id(socket), do: "user_socket:#{socket.assigns.user_id}"
 end

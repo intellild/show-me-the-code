@@ -7,6 +7,8 @@ defmodule ShowMeTheCode.Room do
     field :content, :string, default: ""
     field :language, :string, default: "javascript"
     field :expires, :naive_datetime
+    field :alias, :string
+    field :type, :string, default: "public"
 
     timestamps()
   end
@@ -15,16 +17,20 @@ defmodule ShowMeTheCode.Room do
   def changeset(room, attrs) do
     room
     |> cast(attrs, [:id, :content, :language, :expires])
-    |> validate_not_nil([:content, :language])
+    |> validate_not_nil([:content, :language, :alias, :type])
   end
 
   defp validate_not_nil(changeset, fields) do
-    Enum.reduce(fields, changeset, fn field, changeset ->
-      if get_field(changeset, field) == nil do
-        add_error(changeset, field, "nil")
-      else
-        changeset
+    Enum.reduce(
+      fields,
+      changeset,
+      fn field, changeset ->
+        if get_field(changeset, field) == nil do
+          add_error(changeset, field, "nil")
+        else
+          changeset
+        end
       end
-    end)
+    )
   end
 end
