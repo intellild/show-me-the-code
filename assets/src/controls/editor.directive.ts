@@ -1,12 +1,17 @@
-import { AfterViewInit, Directive, OnDestroy, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Directive, Input, OnDestroy, ViewContainerRef } from '@angular/core';
 import * as monaco from 'monaco-editor';
 
 @Directive({
-  selector: '[monaco-editor]',
+  selector: 'monaco-editor',
 })
 export class EditorDirective implements AfterViewInit, OnDestroy {
   private editor: monaco.editor.IStandaloneCodeEditor | null = null;
   private resizeObserver: ResizeObserver;
+
+  @Input()
+  model: monaco.editor.ITextModel;
+
+  private readonly disposers: (() => void)[] = [];
 
   constructor(private readonly viewContainerRef: ViewContainerRef) {
     this.resizeObserver = new ResizeObserver(() => {
@@ -17,7 +22,7 @@ export class EditorDirective implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const element = this.viewContainerRef.element.nativeElement;
     this.editor = monaco.editor.create(element, {
-      language: 'javascript',
+      model: this.model,
       theme: 'vs-dark',
     });
     this.resizeObserver.observe(element);

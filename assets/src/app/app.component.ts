@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { EditorService } from '../services/editor.service';
 
 @Component({
   selector: 'app-root',
@@ -6,7 +7,8 @@ import { Component } from '@angular/core';
     <div *mobxAutorun class="toolbar">
       <preference></preference>
     </div>
-    <div class="editor" monaco-editor></div>
+    <monaco-editor [model]="model"></monaco-editor>
+    <app-terminal></app-terminal>
   `,
   styles: [
     `
@@ -27,12 +29,20 @@ import { Component } from '@angular/core';
         align-items: center;
       }
 
-      .editor {
+      monaco-editor {
         grid-area: editor;
+      }
+
+      app-terminal {
+        grid-area: output;
       }
     `,
   ],
 })
 export class AppComponent {
+  get model() {
+    return this.editorService.model;
+  }
 
+  constructor(readonly editorService: EditorService) {}
 }

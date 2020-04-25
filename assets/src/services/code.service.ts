@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import * as monaco from 'monaco-editor';
+import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
-import { EditorService } from '../../../client/app/editor.service';
+import { EditorService } from './editor.service';
 import { ConnectionService, ISocketEvents } from './connection.service';
 import { Proto } from '../serializers';
-import { decodeArrayBuffer, encodeArrayBuffer } from '../../../client/app/utils';
-import { MessageService } from 'primeng/api';
+import { decodeArrayBuffer, encodeArrayBuffer } from '../utils';
+// import { MessageService } from 'primeng/api';
 import { debounceTime } from 'rxjs/operators';
 
 function deserializeRange({ startColumn, startLineNumber, endColumn, endLineNumber }: monaco.IRange): monaco.Range {
@@ -46,7 +47,7 @@ export class CodeService {
   constructor(
     private readonly editorService: EditorService,
     private readonly connectionService: ConnectionService,
-    private readonly messageService: MessageService,
+    private readonly toastrService: ToastrService,
   ) {
     this.edit$.pipe(debounceTime(10000)).subscribe(() => {
       this.saveSilently();
@@ -63,22 +64,22 @@ export class CodeService {
   }
 
   init(editor: monaco.editor.IStandaloneCodeEditor) {
-    this.editorService.model.onDidChangeContent(e => {
+    this.editorService.model.onDidChangeContent((e) => {
       if (e.versionId === this.previousSyncVersionId) {
         return;
       }
       this.edit$.next();
       this.onDidContentChange(e);
     });
-    editor.onDidChangeCursorPosition(e => this.onDidChangeCursorPosition(e));
-    editor.onDidChangeCursorSelection(e => this.onDidChangeCursorSelection(e));
+    editor.onDidChangeCursorPosition((e) => this.onDidChangeCursorPosition(e));
+    editor.onDidChangeCursorSelection((e) => this.onDidChangeCursorSelection(e));
     this.connectionService
-      .on('sync.full', msg => this.onReceiveFullSync(msg, editor))
+      .on('sync.full', (msg) => this.onReceiveFullSync(msg, editor))
       .on('sync.full.request', () => this.onReceiveFullSyncRequest())
-      .on('user.edit', msg => this.onReceiveUserEdit(msg, editor))
-      .on('user.selection', msg => this.onReceiveUserSelection(msg))
-      .on('user.cursor', msg => this.onReceiveUserCursor(msg))
-      .on('user.leave', msg => this.removeUserDecorations(msg));
+      .on('user.edit', (msg) => this.onReceiveUserEdit(msg, editor))
+      .on('user.selection', (msg) => this.onReceiveUserSelection(msg))
+      .on('user.cursor', (msg) => this.onReceiveUserCursor(msg))
+      .on('user.leave', (msg) => this.removeUserDecorations(msg));
   }
 
   saveSilently() {
@@ -89,18 +90,10 @@ export class CodeService {
   save() {
     this.saveSilently().then(
       () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Save success',
-          detail: 'Save success',
-        });
+        this.toastrService.info('Save succeed');
       },
       () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Save fail',
-          detail: 'Save fail',
-        });
+        this.toastrService.error('Save fail');
       },
     );
   }
@@ -187,7 +180,7 @@ export class CodeService {
   private async onReceiveUserEdit({ event }: ISocketEvents['user.edit'], editor: monaco.editor.IStandaloneCodeEditor) {
     const buffer = await decodeArrayBuffer(event);
     const { changes } = Proto.Editor.ModelContentChangedEvent.decode(buffer) as monaco.editor.IModelContentChangedEvent;
-    const edits = changes.map(change => ({
+    const edits = changes.map((change) => ({
       ...change,
       range: deserializeRange(change.range),
     }));
@@ -207,7 +200,7 @@ export class CodeService {
     const decorations = this.getDecorations(from);
     decorations.selection = this.model.deltaDecorations(
       decorations.selection,
-      selections.map<monaco.editor.IModelDeltaDecoration>(it => ({
+      selections.map<monaco.editor.IModelDeltaDecoration>((it) => ({
         range: deserializeRange(it as monaco.IRange),
         options: {
           stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
@@ -230,7 +223,7 @@ export class CodeService {
     const decorations = this.getDecorations(from);
     decorations.cursor = this.model.deltaDecorations(
       decorations.cursor,
-      positions.map(position => ({
+      positions.map((position) => ({
         options: {
           className: `user-${user.slot}-cursor`,
           hoverMessage: {

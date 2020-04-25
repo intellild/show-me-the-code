@@ -1,21 +1,18 @@
+import { observable } from 'mobx-angular';
 import { Socket, Channel, Presence } from 'phoenix';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as EventEmitter from 'eventemitter3';
-import { IUser } from '../../../client/models';
-import { post } from '../../../client/app/ajax';
-import { linkEvents, unlinkEvents } from '../../../client/app/utils';
-
-declare const process: any;
-
-const DOMAIN = process.env.NODE_ENV === 'production' ? '//socket.icode.live' : '';
+import { token } from '../auth';
+import { environment } from '../environments/environment';
+import { IUser } from '../models';
+import { linkEvents, unlinkEvents } from '../utils';
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 
-const url =
-  process.env.NODE_ENV === 'production'
-    ? `${protocol}://socket.icode.live/socket`
-    : `${protocol}://${location.hostname}:4000/socket`;
+const url = environment.production
+  ? `${protocol}://socket.icode.live/socket`
+  : `${protocol}://${location.hostname}:4000/socket`;
 
 export interface ISocketEvents {
   'sync.full': { content: string; language: string; expires: string | null };
@@ -29,22 +26,25 @@ export interface ISocketEvents {
 
 const EVENTS = ['sync.full', 'sync.full.request', 'user.edit', 'user.selection', 'user.cursor'];
 
-function pickMeta(_: string, { metas }: { metas: IUser[] }) {
-  return metas[0];
-}
-
 @Injectable()
 export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
-  private socket: Socket | null = null;
-  private roomId = '';
-  readonly connected$ = new BehaviorSubject(false);
-  readonly channel$ = new BehaviorSubject<Channel | null>(null);
-  readonly userList$ = new BehaviorSubject<IUser[]>([]);
-  readonly synchronized$ = new BehaviorSubject(false);
+  @observable
+  connected = false;
+
+  private socket = new Socket(url, {
+    heartbeatIntervalMs: 30000,
+    params: {
+      token,
+    },
+  });
+
+  @observable
+  users = [];
+
+  // readonly userList$ = new BehaviorSubject<IUser[]>([]);
+  // readonly synchronized$ = new BehaviorSubject(false);
   readonly autoSave$ = new BehaviorSubject(false);
-  readonly userMap = new Map<string, IUser>();
-  username = '';
-  userId = '';
+  // readonly userMap = new Map<string, IUser>();
 
   declare on: <K extends keyof ISocketEvents>(
     this: this,
@@ -59,19 +59,14 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
 
   constructor() {
     super();
-    this.on('sync.full', () => this.synchronized$.next(true));
-  }
-
-  create(username: string): Promise<void> {
-    this.username = username;
-    return post<string>(`${DOMAIN}/api/create-one`).then((roomId) => this.join(roomId, username));
+    // this.on('sync.full', () => this.synchronized$.next(true));
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {
-    const channel = this.channel$.getValue();
-    if (channel) {
-      channel.push(event, payload);
-    }
+    // const channel = this.channel$.getValue();
+    // if (channel) {
+    //   channel.push(event, payload);
+    // }
   }
 
   getSocket(username: string): Socket {
@@ -82,10 +77,10 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
           username,
         },
       });
-      this.socket.onOpen(() => this.connected$.next(true));
+      this.socket.onOpen(() => (this.connected = true));
       this.socket.onClose(() => {
-        this.connected$.next(false);
-        this.synchronized$.next(false);
+        this.connected = false;
+        // this.synchronized$.next(false);
       });
       this.socket.connect();
     }
@@ -93,32 +88,25 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   }
 
   join(roomId: string, username: string): Promise<void> {
-    this.username = username;
-    if (this.channel$.getValue() !== null) {
-      return Promise.resolve();
-    }
     const socket = this.getSocket(username);
     const channel = socket.channel(`room:${roomId}`);
     const links = linkEvents(EVENTS, channel, this as EventEmitter<string>);
     const presence = new Presence(channel);
     presence.onSync(() => {
-      const userList = presence.list<IUser>(pickMeta);
-      this.userList$.next(userList);
-      this.userMap.clear();
-      for (let i = 0; i < userList.length; i += 1) {
-        const user = userList[i];
-        this.userMap.set(user.id, user);
-      }
+      const userList = presence.list<IUser>((_, { metas }) => metas[0]);
+      // this.userList$.next(userList);
+      // this.userMap.clear();
+      // for (let i = 0; i < userList.length; i += 1) {
+      //   const user = userList[i];
+      //   this.userMap.set(user.id, user);
+      // }
     });
     presence.onLeave((userId) => this.emit('user.leave', { userId }));
     return new Promise<void>((resolve, reject) => {
       channel
         .join()
         .receive('ok', ({ userId }: { userId: string }) => {
-          this.roomId = roomId;
-          this.userId = userId;
           this.updateUrl();
-          this.channel$.next(channel);
           resolve();
         })
         .receive('error', (msg) => this.handleJoinError(msg, links, channel, reject));
@@ -126,28 +114,24 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   }
 
   save(content: string, language: string): Promise<void> {
-    const channel = this.channel$.getValue();
-    if (!channel) {
-      return Promise.reject();
-    }
+    // const channel = this.channel$.getValue();
+    // if (!channel) {
+    //   return Promise.reject();
+    // }
     return new Promise<void>((resolve, reject) => {
-      channel
-        .push('save', {
-          content,
-          language,
-        })
-        .receive('ok', resolve)
-        .receive('error', reject);
+      // channel
+      //   .push('save', {
+      //     content,
+      //     language,
+      //   })
+      //   .receive('ok', resolve)
+      //   .receive('error', reject);
     });
-  }
-
-  getUserCount() {
-    return this.userList$.getValue().length;
   }
 
   private updateUrl() {
     const url = new URL(location.href);
-    url.searchParams.set('roomId', this.roomId);
+    // url.searchParams.set('roomId', this.roomId);
     history.replaceState(history.state, '', url.href);
   }
 
@@ -172,6 +156,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
       default:
         break;
     }
+
     // this.messageService.add({
     //   severity: 'error',
     //   summary: 'Join fail',
@@ -179,7 +164,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     // });
     if (leave) {
       channel.leave();
-      this.channel$.next(null);
+      // this.channel$.next(null);
       unlinkEvents(links, channel);
     }
     reject(new Error(msg));
