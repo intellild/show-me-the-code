@@ -15,7 +15,7 @@ config :show_me_the_code, ShowMeTheCodeWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "NrstlVMR87dp0qpxK2Os/ZIoTO0NYA7MnOcePjlcqB9GXNVR3ppx6sQRrknvPNv2",
   render_errors: [view: ShowMeTheCodeWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: ShowMeTheCode.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: MyApp.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

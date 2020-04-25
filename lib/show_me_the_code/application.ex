@@ -10,14 +10,16 @@ defmodule ShowMeTheCode.Application do
     children = [
       # Start the Ecto repository
       ShowMeTheCode.Repo,
+      # Start the PubSub system
+      {Phoenix.PubSub, name: ShowMeTheCode.PubSub},
+      ShowMeTheCode.Room.Presence,
       # Start the endpoint when the application starts
       ShowMeTheCodeWeb.Endpoint,
       # Starts a worker by calling: ShowMeTheCode.Worker.start_link(arg)
       # {ShowMeTheCode.Worker, arg},
       {ShowMeTheCode.Room.Registry, name: ShowMeTheCode.Room.Registry},
       {ShowMeTheCode.Room.Watcher, name: ShowMeTheCode.Room.Watcher},
-      {DynamicSupervisor, name: ShowMeTheCode.Room.Supervisor, strategy: :one_for_one},
-      ShowMeTheCode.Room.Presence
+      {DynamicSupervisor, name: ShowMeTheCode.Room.Supervisor, strategy: :one_for_one}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
