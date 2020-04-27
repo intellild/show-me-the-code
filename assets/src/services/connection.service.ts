@@ -65,19 +65,23 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
 
   constructor(private readonly spinner: SpinnerService) {
     super();
-    this.spinner.open();
-    this.socket.onOpen((userId) => {
-      this.userId = userId;
-      this.userChannel = this.socket.channel(`user:${userId}`);
+    this.socket.onOpen(() => {
+      this.userChannel = this.socket.channel(`user:${token}`);
       this.userChannel
         .join()
         .receive('ok', () => {
           this.connected = true;
+          this.spinner.close();
         })
         .receive('error', () => {
           console.error('Fatal');
         });
     });
+  }
+
+  connect() {
+    this.spinner.open();
+    this.socket.connect();
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {

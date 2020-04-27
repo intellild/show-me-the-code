@@ -16,13 +16,12 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(%{"token" => token}, socket, _connect_info) when is_bitstring(token) do
+  def connect(%{"token" => token}, socket, _connect_info) do
     user_id = token
     socket = socket
-             |> assign(:id, UUID.uuid4())
              |> assign(:user_id, user_id)
              |> assign(:username, token)
-    {:ok, user_id, socket}
+    {:ok, socket}
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { CodeService } from "../services/code.service";
+import { AfterViewInit, Component } from '@angular/core';
+import { CodeService } from '../services/code.service';
+import { ConnectionService } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 
 @Component({
@@ -12,7 +13,7 @@ import { EditorService } from '../services/editor.service';
     <app-terminal></app-terminal>
   `,
   styles: [
-      `
+    `
       :host {
         overflow: hidden;
         display: grid;
@@ -38,11 +39,14 @@ import { EditorService } from '../services/editor.service';
     `,
   ],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   get model() {
     return this.editorService.model;
   }
 
-  constructor(private readonly editorService: EditorService, private readonly codeService: CodeService) {
+  constructor(private readonly editorService: EditorService, private readonly connectionService: ConnectionService) {}
+
+  ngAfterViewInit(): void {
+    this.connectionService.connect();
   }
 }
