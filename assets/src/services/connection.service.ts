@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as EventEmitter from 'eventemitter3';
 import { token } from '../auth';
+import { SpinnerService } from '../controls/spinner.service';
 import { environment } from '../environments/environment';
 import { IUser } from '../models';
 import { linkEvents, unlinkEvents } from '../utils';
@@ -31,19 +32,24 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   @observable
   connected = false;
 
-  private socket = new Socket(url, {
+  private readonly socket = new Socket(url, {
     heartbeatIntervalMs: 30000,
     params: {
       token,
     },
   });
 
+  private userChannel: Channel | null = null;
+  private roomChannel: Channel | null = null;
+
   @observable
-  users = [];
+  users: IUser[] = [];
+
+  userId = '';
 
   // readonly userList$ = new BehaviorSubject<IUser[]>([]);
   // readonly synchronized$ = new BehaviorSubject(false);
-  readonly autoSave$ = new BehaviorSubject(false);
+  // readonly autoSave$ = new BehaviorSubject(false);
   // readonly userMap = new Map<string, IUser>();
 
   declare on: <K extends keyof ISocketEvents>(
@@ -57,59 +63,49 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     cb: (message: ISocketEvents[K], context?: any) => void,
   ) => this;
 
-  constructor() {
+  constructor(private readonly spinner: SpinnerService) {
     super();
-    // this.on('sync.full', () => this.synchronized$.next(true));
+    this.spinner.open();
+    this.socket.onOpen((userId) => {
+      this.userId = userId;
+      this.userChannel = this.socket.channel(`user:${userId}`);
+      this.userChannel
+        .join()
+        .receive('ok', () => {
+          this.connected = true;
+        })
+        .receive('error', () => {
+          console.error('Fatal');
+        });
+    });
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {
-    // const channel = this.channel$.getValue();
-    // if (channel) {
-    //   channel.push(event, payload);
-    // }
-  }
-
-  getSocket(username: string): Socket {
-    if (this.socket === null) {
-      this.socket = new Socket(url, {
-        heartbeatIntervalMs: 30000,
-        params: {
-          username,
-        },
-      });
-      this.socket.onOpen(() => (this.connected = true));
-      this.socket.onClose(() => {
-        this.connected = false;
-        // this.synchronized$.next(false);
-      });
-      this.socket.connect();
-    }
-    return this.socket;
+    this.roomChannel?.push(event, payload);
   }
 
   join(roomId: string, username: string): Promise<void> {
-    const socket = this.getSocket(username);
-    const channel = socket.channel(`room:${roomId}`);
-    const links = linkEvents(EVENTS, channel, this as EventEmitter<string>);
-    const presence = new Presence(channel);
-    presence.onSync(() => {
-      const userList = presence.list<IUser>((_, { metas }) => metas[0]);
-      // this.userList$.next(userList);
-      // this.userMap.clear();
-      // for (let i = 0; i < userList.length; i += 1) {
-      //   const user = userList[i];
-      //   this.userMap.set(user.id, user);
-      // }
-    });
-    presence.onLeave((userId) => this.emit('user.leave', { userId }));
+    // const channel = socket.channel(`room:${roomId}`);
+    // const links = linkEvents(EVENTS, channel, this as EventEmitter<string>);
+    // const presence = new Presence(channel);
+    // presence.onSync(() => {
+    //   const userList = presence.list<IUser>((_, { metas }) => metas[0]);
+    // this.userList$.next(userList);
+    // this.userMap.clear();
+    // for (let i = 0; i < userList.length; i += 1) {
+    //   const user = userList[i];
+    //   this.userMap.set(user.id, user);
+    // }
+    // });
+    // presence.onLeave((userId) => this.emit('user.leave', { userId }));
     return new Promise<void>((resolve, reject) => {
-      channel
-        .join()
-        .receive('ok', ({ userId }: { userId: string }) => {
-          this.updateUrl();
-          resolve();
-        })
-        .receive('error', (msg) => this.handleJoinError(msg, links, channel, reject));
+      // channel
+      //   .join()
+      //   .receive('ok', ({ userId }: { userId: string }) => {
+      //     this.updateUrl();
+      //     resolve();
+      //   })
+      //   .receive('error', (msg) => this.handleJoinError(msg, links, channel, reject));
     });
   }
 

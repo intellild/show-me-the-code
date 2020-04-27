@@ -14,8 +14,9 @@ import { PreferenceComponent } from './preference.component';
 
 @NgModule({
   declarations: [AppComponent, PreferenceComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ToastrModule],
+  imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ToastrModule.forRoot()],
   providers: [CodeService, ConnectionService, EditorService, TerminalService],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

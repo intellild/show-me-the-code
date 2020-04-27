@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CodeService } from "../services/code.service";
 import { EditorService } from '../services/editor.service';
 
 @Component({
@@ -11,13 +12,11 @@ import { EditorService } from '../services/editor.service';
     <app-terminal></app-terminal>
   `,
   styles: [
-    `
+      `
       :host {
         overflow: hidden;
         display: grid;
-        grid-template:
-          'header header' 60px
-          'editor output' minmax(0, 1fr);
+        grid-template: 'header header' 60px 'editor output' minmax(0, 1fr);
         grid-template-columns: minmax(0, 1fr) 38.2%;
       }
 
@@ -44,5 +43,6 @@ export class AppComponent {
     return this.editorService.model;
   }
 
-  constructor(readonly editorService: EditorService) {}
+  constructor(private readonly editorService: EditorService, private readonly codeService: CodeService) {
+  }
 }

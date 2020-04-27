@@ -191,7 +191,7 @@ export class CodeService {
   }
 
   private async onReceiveUserSelection({ event, from }: ISocketEvents['user.selection']) {
-    const user = this.connectionService.userMap.get(from);
+    const user = this.connectionService.users.find((it) => it.id === from);
     if (!user) {
       return;
     }
@@ -214,7 +214,7 @@ export class CodeService {
   }
 
   private async onReceiveUserCursor({ from, event }: ISocketEvents['user.cursor']) {
-    const user = this.connectionService.userMap.get(from);
+    const user = this.connectionService.users.find((it) => it.id === from);
     if (!user) {
       return;
     }
