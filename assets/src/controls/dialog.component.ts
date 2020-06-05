@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Inject, InjectionToken } from '@angular/core';
+import { Component, Inject, InjectionToken } from '@angular/core';
 import { Portal } from '@angular/cdk/portal';
 
 export const DialogContentToken = new InjectionToken('DIALOG_CONTENT');
@@ -21,10 +21,6 @@ export const DialogContentToken = new InjectionToken('DIALOG_CONTENT');
     `,
   ],
 })
-export class DialogComponent implements AfterViewInit {
+export class DialogComponent {
   constructor(@Inject(DialogContentToken) readonly content: Portal<any>) {}
-
-  ngAfterViewInit() {
-    console.log("After view init")
-  }
 }
