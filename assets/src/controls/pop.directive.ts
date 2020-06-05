@@ -77,7 +77,6 @@ export class PopDirective implements AfterViewInit, OnDestroy {
   }
 
   private close() {
-    console.log('close', this.overlayRef)
     if (!this.overlayRef) {
       return;
     }

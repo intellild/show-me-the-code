@@ -10,13 +10,23 @@ import { InputComponent } from './input.component';
 import { PopDirective } from './pop.directive';
 import { SelectComponent } from './select.component';
 import { SpinnerComponent } from './spinner.component';
-import { SpinnerService } from "./spinner.service";
+import { SpinnerService } from './spinner.service';
 import { TerminalDirective } from './terminal.directive';
+import { DialogComponent } from './dialog.component';
+import { DialogService } from './dialog.service';
 
 @NgModule({
-  declarations: [EditorDirective, InputComponent, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective],
+  declarations: [
+    DialogComponent,
+    EditorDirective,
+    InputComponent,
+    PopDirective,
+    SelectComponent,
+    SpinnerComponent,
+    TerminalDirective,
+  ],
   imports: [BrowserModule, BrowserAnimationsModule, MobxAngularModule, OverlayModule, PortalModule],
-  providers: [SpinnerService, TerminalService],
+  providers: [DialogService, SpinnerService, TerminalService],
   exports: [EditorDirective, InputComponent, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective],
 })
 export class ControlsModule {}
