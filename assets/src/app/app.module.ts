@@ -11,9 +11,10 @@ import { TerminalService } from '../services/terminal.service';
 
 import { AppComponent } from './app.component';
 import { PreferenceComponent } from './preference.component';
+import {ShelfComponent} from "./shelf.component";
 
 @NgModule({
-  declarations: [AppComponent, PreferenceComponent],
+  declarations: [AppComponent, ShelfComponent, PreferenceComponent],
   imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ToastrModule.forRoot()],
   providers: [CodeService, ConnectionService, EditorService, TerminalService],
   bootstrap: [AppComponent],

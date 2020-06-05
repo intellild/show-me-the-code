@@ -1,7 +1,12 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { CodeService } from '../services/code.service';
 import { ConnectionService } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
+import { DialogService } from '../controls/dialog.service';
+import { IReactionDisposer, observe } from 'mobx';
+import { ShelfComponent } from './shelf.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -39,14 +44,31 @@ import { EditorService } from '../services/editor.service';
     `,
   ],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnDestroy {
+  private readonly $$: Subscription[] = [];
+
   get model() {
     return this.editorService.model;
   }
 
-  constructor(private readonly editorService: EditorService, private readonly connectionService: ConnectionService) {}
+  constructor(
+    private readonly editorService: EditorService,
+    private readonly connectionService: ConnectionService,
+    private readonly dialogService: DialogService,
+  ) {}
 
   ngAfterViewInit(): void {
+    this.$$.push(
+      this.connectionService.connected$.pipe(distinctUntilChanged()).subscribe((connected) => {
+        if (connected) {
+          this.dialogService.open(ShelfComponent);
+        }
+      }),
+    );
     this.connectionService.connect();
+  }
+
+  ngOnDestroy() {
+    this.$$.forEach((it) => it.unsubscribe());
   }
 }

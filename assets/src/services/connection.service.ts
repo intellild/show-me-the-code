@@ -29,8 +29,7 @@ const EVENTS = ['sync.full', 'sync.full.request', 'user.edit', 'user.selection',
 
 @Injectable()
 export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
-  @observable
-  connected = false;
+  public readonly connected$ = new BehaviorSubject(false);
 
   private readonly socket = new Socket(url, {
     heartbeatIntervalMs: 30000,
@@ -70,7 +69,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
       this.userChannel
         .join()
         .receive('ok', () => {
-          this.connected = true;
+          this.connected$.next(true);
           this.spinner.close();
         })
         .receive('error', () => {
