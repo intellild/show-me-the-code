@@ -11,6 +11,7 @@ import { PopDirective } from './pop.directive';
 import { SelectComponent } from './select.component';
 import { SpinnerComponent } from './spinner.component';
 import { SpinnerService } from './spinner.service';
+import { TabsComponent } from "./tabs.component";
 import { TerminalDirective } from './terminal.directive';
 import { DialogComponent } from './dialog.component';
 import { DialogService } from './dialog.service';
@@ -23,10 +24,11 @@ import { DialogService } from './dialog.service';
     PopDirective,
     SelectComponent,
     SpinnerComponent,
+    TabsComponent,
     TerminalDirective,
   ],
   imports: [BrowserModule, BrowserAnimationsModule, MobxAngularModule, OverlayModule, PortalModule],
   providers: [DialogService, SpinnerService, TerminalService],
-  exports: [EditorDirective, InputComponent, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective],
+  exports: [EditorDirective, InputComponent, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective, TabsComponent],
 })
 export class ControlsModule {}

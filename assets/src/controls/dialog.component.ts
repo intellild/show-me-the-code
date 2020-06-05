@@ -5,18 +5,13 @@ export const DialogContentToken = new InjectionToken('DIALOG_CONTENT');
 
 @Component({
   selector: 'app-dialog',
-  template: `
-    <div>
-      <ng-template [cdkPortalOutlet]="content"></ng-template>
-    </div>
-  `,
+  template: ` <ng-template [cdkPortalOutlet]="content"></ng-template> `,
   styles: [
     `
       :host {
-        background-color: #2b2b2b;
-        box-shadow: rgba(0, 0, 0, 0.19) 0 0 8px;
+        background-color: #252526;
+        box-shadow: #000 0 0 8px;
         color: #eeffff;
-        padding: 20px;
       }
     `,
   ],

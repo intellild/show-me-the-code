@@ -2,8 +2,6 @@ import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
-  ComponentRef,
-  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
