@@ -4,7 +4,7 @@ import { DialogService } from '../controls/dialog.service';
 import { SpinnerService } from '../controls/spinner.service';
 import { ConnectionService, ConnectState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
-import { UserService } from '../services/user.service';
+import { GithubService } from '../services/github.service';
 import { ShelfComponent } from "./shelf.component";
 
 @Component({
@@ -51,7 +51,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor(
-    private readonly userService: UserService,
+    private readonly userService: GithubService,
     private readonly editorService: EditorService,
     private readonly connectionService: ConnectionService,
     private readonly dialogService: DialogService,

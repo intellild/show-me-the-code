@@ -9,18 +9,23 @@ export interface ITab {
 @Component({
   selector: 'app-tabs',
   template: `
-    <div
-      *ngFor="let tab of tabs; trackBy: trackBy"
-      class="tab"
-      [class.active]="active === tab.key"
-      (click)="onClick(tab)"
-    >
-      {{ tab.text }}
+    <div class="tabs">
+      <div
+        *ngFor="let tab of tabs; trackBy: trackBy"
+        class="tab"
+        [class.active]="active === tab.key"
+        (click)="onClick(tab)"
+      >
+        {{ tab.text }}
+      </div>
+    </div>
+    <div class="content">
+      <ng-content></ng-content>
     </div>
   `,
   styles: [
     `
-      :host {
+      .tabs {
         display: flex;
         flex-direction: row;
         height: 35px;
@@ -39,10 +44,15 @@ export interface ITab {
         box-sizing: border-box;
         padding: 0 10px;
         background-color: rgb(45, 45, 45);
-        color: rgb(255, 255, 255);
+        color: rgba(255, 255, 255, 0.5);
       }
 
       .tab.active {
+        background-color: rgb(30, 30, 30);
+        color: rgb(255, 255, 255);
+      }
+
+      .content {
         background-color: rgb(30, 30, 30);
       }
     `,

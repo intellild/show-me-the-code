@@ -7,7 +7,7 @@ import { SpinnerService } from '../controls/spinner.service';
 import { environment } from '../environments/environment';
 import { IUser } from '../models';
 import { linkEvents, unlinkEvents } from '../utils';
-import { UserService } from './user.service';
+import { GithubService } from './github.service';
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 
@@ -66,11 +66,11 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     cb: (message: ISocketEvents[K], context?: any) => void,
   ) => this;
 
-  constructor(private readonly userService: UserService) {
+  constructor(private readonly githubService: GithubService) {
     super();
   }
 
-  connect(user: IUser) {
+  connect(user: IUser) {``
     this.socket.onOpen(() => {
       this.connectState$.next(ConnectState.Connected);
       this.userChannel = this.socket.channel(`user:${user.id}`);
@@ -84,7 +84,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
         });
     });
     this.socket.connect({
-      token: this.userService.token,
+      token: this.githubService.token,
     });
   }
 

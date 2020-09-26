@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Octokit } from '@octokit/rest';
 import * as Cookie from 'cookie';
-import { IUser } from "../models";
+import { IGist, IGistFile, IUser } from '../models';
 
 @Injectable()
-export class UserService {
+export class GithubService {
   private readonly client: Octokit;
   private user: IUser | null = null;
   public readonly token: string;
@@ -31,10 +31,38 @@ export class UserService {
         avatar: data.avatar_url,
         url: data.html_url,
         email: data.email,
-        name: data.name
+        name: data.name,
       };
     }
     return this.user;
+  }
+
+  async getGists(page: number): Promise<IGist[]> {
+    const { data, status } = await this.client.gists.list({
+      per_page: 20,
+      page,
+    });
+    if (status !== 200) {
+      return [];
+    }
+    return data.map((gist) => {
+      const { id, description, public: isPublic, created_at, updated_at } = gist;
+      const files: IGistFile[] = Object.values(gist.files).map(({ filename, type, language }) => ({
+        filename,
+        type,
+        language,
+      }));
+      const name = files.length ? files[0].filename : '';
+      return {
+        id,
+        name,
+        isPublic,
+        createdAt: new Date(created_at),
+        updatedAt: new Date(updated_at),
+        description,
+        files,
+      };
+    });
   }
 
   private getToken(): string | undefined {
@@ -42,7 +70,7 @@ export class UserService {
   }
 
   private auth(): never {
-    location.href = "/api/auth/github";
-    throw new Error("auth");
+    location.href = '/api/auth/github';
+    throw new Error('auth');
   }
 }
