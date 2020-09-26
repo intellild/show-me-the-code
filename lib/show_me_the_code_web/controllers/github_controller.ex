@@ -14,7 +14,7 @@ defmodule ShowMeTheCodeWeb.GithubController do
     case exchange_token(code) do
       {:ok, token} ->
         conn
-        |> put_resp_cookie("github_token", token)
+        |> put_resp_cookie("github_token", token, http_only: false)
         |> redirect(to: "/")
       _ -> put_status(conn, 403)
     end
@@ -41,7 +41,10 @@ defmodule ShowMeTheCodeWeb.GithubController do
     response = HTTPoison.post(
       "https://github.com/login/oauth/access_token",
       body,
-      [{"Content-Type", "application/json"}]
+      [
+        {"Content-Type", "application/json"},
+        {"Accept", "application/json"}
+      ]
     )
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

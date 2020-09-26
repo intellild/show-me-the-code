@@ -7,14 +7,14 @@ import { IUser } from "../models";
 export class UserService {
   private readonly client: Octokit;
   private user: IUser | null = null;
+  public readonly token: string;
 
   constructor() {
     const token = this.getToken();
-    console.log(token)
     if (!token) {
-      location.href = "/api/auth/github";
-      return;
+      this.auth();
     }
+    this.token = token;
     this.client = new Octokit({
       auth: token,
     });
@@ -22,7 +22,10 @@ export class UserService {
 
   async getUser(): Promise<IUser> {
     if (!this.user) {
-      const { data } = await this.client.users.getAuthenticated();
+      const { data, status } = await this.client.users.getAuthenticated();
+      if (status !== 200) {
+        this.auth();
+      }
       this.user = {
         id: data.id,
         avatar: data.avatar_url,
@@ -36,5 +39,10 @@ export class UserService {
 
   private getToken(): string | undefined {
     return Cookie.parse(document.cookie).github_token;
+  }
+
+  private auth(): never {
+    location.href = "/api/auth/github";
+    throw new Error("auth");
   }
 }

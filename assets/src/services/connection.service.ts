@@ -3,11 +3,11 @@ import { Socket, Channel, Presence } from 'phoenix';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as EventEmitter from 'eventemitter3';
-import { token } from '../auth';
 import { SpinnerService } from '../controls/spinner.service';
 import { environment } from '../environments/environment';
 import { IUser } from '../models';
 import { linkEvents, unlinkEvents } from '../utils';
+import { UserService } from './user.service';
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 
@@ -27,14 +27,21 @@ export interface ISocketEvents {
 
 const EVENTS = ['sync.full', 'sync.full.request', 'user.edit', 'user.selection', 'user.cursor'];
 
+export enum ConnectState {
+  Connecting = 'connecting',
+  Connected = 'connected',
+  LoginSuccess = 'login-success',
+  JoinSuccess = 'join-success',
+}
+
 @Injectable()
 export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
-  public readonly connected$ = new BehaviorSubject(false);
+  public readonly connectState$ = new BehaviorSubject(ConnectState.Connecting);
 
   private readonly socket = new Socket(url, {
     heartbeatIntervalMs: 30000,
     params: {
-      token,
+      // token,
     },
   });
 
@@ -43,9 +50,6 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
 
   @observable
   users: IUser[] = [];
-
-  userId = '';
-
   // readonly userList$ = new BehaviorSubject<IUser[]>([]);
   // readonly synchronized$ = new BehaviorSubject(false);
   // readonly autoSave$ = new BehaviorSubject(false);
@@ -62,25 +66,26 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     cb: (message: ISocketEvents[K], context?: any) => void,
   ) => this;
 
-  constructor(private readonly spinner: SpinnerService) {
+  constructor(private readonly userService: UserService) {
     super();
+  }
+
+  connect(user: IUser) {
     this.socket.onOpen(() => {
-      this.userChannel = this.socket.channel(`user:${token}`);
+      this.connectState$.next(ConnectState.Connected);
+      this.userChannel = this.socket.channel(`user:${user.id}`);
       this.userChannel
         .join()
         .receive('ok', () => {
-          this.connected$.next(true);
-          this.spinner.close();
+          this.connectState$.next(ConnectState.LoginSuccess);
         })
         .receive('error', () => {
           console.error('Fatal');
         });
     });
-  }
-
-  connect() {
-    this.spinner.open();
-    this.socket.connect();
+    this.socket.connect({
+      token: this.userService.token,
+    });
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {

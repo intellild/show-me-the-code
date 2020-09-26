@@ -1,13 +1,11 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
-import { distinctUntilChanged } from 'rxjs/operators';
-import { CodeService } from '../services/code.service';
-import { ConnectionService } from '../services/connection.service';
-import { EditorService } from '../services/editor.service';
-import { DialogService } from '../controls/dialog.service';
-import { IReactionDisposer, observe } from 'mobx';
-import { UserService } from "../services/user.service";
-import { ShelfComponent } from './shelf.component';
 import { Subscription } from 'rxjs';
+import { DialogService } from '../controls/dialog.service';
+import { SpinnerService } from '../controls/spinner.service';
+import { ConnectionService, ConnectState } from '../services/connection.service';
+import { EditorService } from '../services/editor.service';
+import { UserService } from '../services/user.service';
+import { ShelfComponent } from "./shelf.component";
 
 @Component({
   selector: 'app-root',
@@ -57,19 +55,27 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     private readonly editorService: EditorService,
     private readonly connectionService: ConnectionService,
     private readonly dialogService: DialogService,
+    private readonly spinnerService: SpinnerService,
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
-    // const user = await this.userService.getUser();
-    // console.log(user);
-    // this.$$.push(
-    //   this.connectionService.connected$.pipe(distinctUntilChanged()).subscribe((connected) => {
-    //     if (connected) {
-    //       this.dialogService.open(ShelfComponent);
-    //     }
-    //   }),
-    // );
-    // this.connectionService.connect();
+    this.$$.push(
+      this.connectionService.connectState$.subscribe((state) => {
+        switch (state) {
+          case ConnectState.Connecting:
+            this.spinnerService.open();
+            break;
+          case ConnectState.LoginSuccess:
+            this.spinnerService.close();
+            this.dialogService.open(ShelfComponent);
+            break;
+          default:
+            break;
+        }
+      }),
+    );
+    const user = await this.userService.getUser();
+    this.connectionService.connect(user);
   }
 
   ngOnDestroy() {

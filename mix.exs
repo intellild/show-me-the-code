@@ -45,7 +45,8 @@ defmodule ShowMeTheCode.MixProject do
       {:plug_cowboy, "~> 2.1"},
       {:uuid, "~> 1.1"},
       {:typed_struct, "~> 0.1.4"},
-      {:httpoison, "~> 1.6"}
+      {:httpoison, "~> 1.6"},
+      {:tentacat, "~> 1.0"}
     ]
   end
 

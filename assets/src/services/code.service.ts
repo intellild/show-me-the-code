@@ -116,20 +116,20 @@ export class CodeService {
     }
     const buffer = Proto.Editor.ModelContentChangedEvent.encode(e).finish();
     const base64 = await encodeArrayBuffer(buffer);
-    this.connectionService.push('user.edit', {
-      from: this.connectionService.userId,
-      event: base64,
-    });
+    // this.connectionService.push('user.edit', {
+    //   from: this.connectionService.userId,
+    //   event: base64,
+    // });
   }
 
   private async onDidChangeCursorPosition({ position, secondaryPositions }: monaco.editor.ICursorPositionChangedEvent) {
     const positions = [position].concat(secondaryPositions);
     const buffer = Proto.Editor.UserCursor.encode({ positions }).finish();
     const base64 = await encodeArrayBuffer(buffer);
-    this.connectionService.push('user.cursor', {
-      from: this.connectionService.userId,
-      event: base64,
-    });
+    // this.connectionService.push('user.cursor', {
+    //   from: this.connectionService.userId,
+    //   event: base64,
+    // });
   }
 
   private async onDidChangeCursorSelection({
@@ -141,10 +141,10 @@ export class CodeService {
       selections,
     }).finish();
     const base64 = await encodeArrayBuffer(buffer);
-    this.connectionService.push('user.selection', {
-      from: this.connectionService.userId,
-      event: base64,
-    });
+    // this.connectionService.push('user.selection', {
+    //   from: this.connectionService.userId,
+    //   event: base64,
+    // });
   }
 
   private onReceiveFullSync(

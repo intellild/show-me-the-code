@@ -17,11 +17,17 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   def connect(%{"token" => token}, socket, _connect_info) do
-    user_id = token
-    socket = socket
-             |> assign(:user_id, user_id)
-             |> assign(:username, token)
-    {:ok, socket}
+    client = Tentacat.Client.new(%{access_token: token})
+    case Tentacat.Users.me(client) do
+      {200, %{"id" => user_id, "name" => username}, _} ->
+        socket = socket
+                 |> assign(:user_id, user_id)
+                 |> assign(:username, username)
+        {:ok, socket}
+      {_, %{"message" => message}, _} -> {:error, message}
+      _ -> {:error, "unknown"}
+    end
+
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
