@@ -15,9 +15,9 @@ defmodule ShowMeTheCodeWeb.Router do
 
   scope "/api", ShowMeTheCodeWeb do
     pipe_through :api
-
-    post "/create-one", RoomController, :create_one
-    post "/create-many", RoomController, :create_many
+    
+    get "/auth/github", GithubController, :auth
+    get "/auth/github/callback", GithubController, :callback
   end
 
   # Other scopes may use custom stacks.

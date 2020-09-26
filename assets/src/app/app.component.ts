@@ -5,6 +5,7 @@ import { ConnectionService } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { DialogService } from '../controls/dialog.service';
 import { IReactionDisposer, observe } from 'mobx';
+import { UserService } from "../services/user.service";
 import { ShelfComponent } from './shelf.component';
 import { Subscription } from 'rxjs';
 
@@ -52,20 +53,23 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor(
+    private readonly userService: UserService,
     private readonly editorService: EditorService,
     private readonly connectionService: ConnectionService,
     private readonly dialogService: DialogService,
   ) {}
 
-  ngAfterViewInit(): void {
-    this.$$.push(
-      this.connectionService.connected$.pipe(distinctUntilChanged()).subscribe((connected) => {
-        if (connected) {
-          this.dialogService.open(ShelfComponent);
-        }
-      }),
-    );
-    this.connectionService.connect();
+  async ngAfterViewInit(): Promise<void> {
+    // const user = await this.userService.getUser();
+    // console.log(user);
+    // this.$$.push(
+    //   this.connectionService.connected$.pipe(distinctUntilChanged()).subscribe((connected) => {
+    //     if (connected) {
+    //       this.dialogService.open(ShelfComponent);
+    //     }
+    //   }),
+    // );
+    // this.connectionService.connect();
   }
 
   ngOnDestroy() {

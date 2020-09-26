@@ -11,10 +11,11 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
-config :show_me_the_code, ShowMeTheCode.Repo,
-  # ssl: true,
-  url: database_url,
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+config :show_me_the_code,
+       ShowMeTheCode.Repo,
+       # ssl: true,
+       url: database_url,
+       pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||
@@ -23,9 +24,12 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
-config :show_me_the_code, ShowMeTheCodeWeb.Endpoint,
-  http: [port: String.to_integer(System.get_env("PORT") || "4000")],
-  secret_key_base: secret_key_base
+config :show_me_the_code,
+       ShowMeTheCodeWeb.Endpoint,
+       http: [
+         port: String.to_integer(System.get_env("PORT") || "4000")
+       ],
+       secret_key_base: secret_key_base
 
 # ## Using releases (Elixir v1.9+)
 #

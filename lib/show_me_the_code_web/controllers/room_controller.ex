@@ -23,9 +23,13 @@ defmodule ShowMeTheCodeWeb.RoomController do
         end
 
       multi =
-        Enum.reduce(1..amount, Multi.new(), fn index, multi ->
-          Multi.insert(multi, index, %Room{expires: expires})
-        end)
+        Enum.reduce(
+          1..amount,
+          Multi.new(),
+          fn index, multi ->
+            Multi.insert(multi, index, %Room{expires: expires})
+          end
+        )
 
       {:ok, result} = Repo.transaction(multi)
       response = Enum.map(result, fn {_, value} -> value.id end)

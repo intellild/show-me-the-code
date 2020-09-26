@@ -191,48 +191,48 @@ export class CodeService {
   }
 
   private async onReceiveUserSelection({ event, from }: ISocketEvents['user.selection']) {
-    const user = this.connectionService.users.find((it) => it.id === from);
-    if (!user) {
-      return;
-    }
-    const buffer = await decodeArrayBuffer(event);
-    const { selections } = Proto.Editor.UserSelection.decode(buffer);
-    const decorations = this.getDecorations(from);
-    decorations.selection = this.model.deltaDecorations(
-      decorations.selection,
-      selections.map<monaco.editor.IModelDeltaDecoration>((it) => ({
-        range: deserializeRange(it as monaco.IRange),
-        options: {
-          stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-          className: `user-${user.slot}-selection`,
-          hoverMessage: {
-            value: `Selection: ${user.name}`,
-          },
-        },
-      })),
-    );
+    // const user = this.connectionService.users.find((it) => it.id === from);
+    // if (!user) {
+    //   return;
+    // }
+    // const buffer = await decodeArrayBuffer(event);
+    // const { selections } = Proto.Editor.UserSelection.decode(buffer);
+    // const decorations = this.getDecorations(from);
+    // decorations.selection = this.model.deltaDecorations(
+    //   decorations.selection,
+    //   selections.map<monaco.editor.IModelDeltaDecoration>((it) => ({
+    //     range: deserializeRange(it as monaco.IRange),
+    //     options: {
+    //       stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+    //       className: `user-${user.slot}-selection`,
+    //       hoverMessage: {
+    //         value: `Selection: ${user.name}`,
+    //       },
+    //     },
+    //   })),
+    // );
   }
 
   private async onReceiveUserCursor({ from, event }: ISocketEvents['user.cursor']) {
-    const user = this.connectionService.users.find((it) => it.id === from);
-    if (!user) {
-      return;
-    }
-    const buffer = await decodeArrayBuffer(event);
-    const { positions } = await Proto.Editor.UserCursor.decode(buffer);
-    const decorations = this.getDecorations(from);
-    decorations.cursor = this.model.deltaDecorations(
-      decorations.cursor,
-      positions.map((position) => ({
-        options: {
-          className: `user-${user.slot}-cursor`,
-          hoverMessage: {
-            value: `Cursor: ${user.name}`,
-          },
-        },
-        range: positionToRange(position as monaco.IPosition),
-      })),
-    );
+    // const user = this.connectionService.users.find((it) => it.id === from);
+    // if (!user) {
+    //   return;
+    // }
+    // const buffer = await decodeArrayBuffer(event);
+    // const { positions } = await Proto.Editor.UserCursor.decode(buffer);
+    // const decorations = this.getDecorations(from);
+    // decorations.cursor = this.model.deltaDecorations(
+    //   decorations.cursor,
+    //   positions.map((position) => ({
+    //     options: {
+    //       className: `user-${user.slot}-cursor`,
+    //       hoverMessage: {
+    //         value: `Cursor: ${user.name}`,
+    //       },
+    //     },
+    //     range: positionToRange(position as monaco.IPosition),
+    //   })),
+    // );
   }
 
   private removeUserDecorations({ userId }: ISocketEvents['user.leave']) {

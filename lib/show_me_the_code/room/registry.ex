@@ -29,7 +29,8 @@ defmodule ShowMeTheCode.Room.Registry do
   @impl true
   def handle_cast({:DOWN, ref, :process, _pid, _reason}, {rooms, refs}) do
     {room_id, refs} = Map.pop(refs, ref)
-    rooms = Map.delete(rooms, room_id)
+    {room_pid, rooms} = Map.pop(rooms, room_id)
+    :ok = DynamicSupervisor.terminate_child(room_pid)
     {:noreply, {rooms, refs}}
   end
 

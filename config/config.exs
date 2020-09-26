@@ -10,12 +10,26 @@ use Mix.Config
 config :show_me_the_code,
   ecto_repos: [ShowMeTheCode.Repo]
 
+github_client_id =
+  System.get_env("GITHUB_CLIENT_ID") ||
+    raise """
+    environment variable GITHUB_CLIENT_ID is missing.
+    """
+
+github_client_secret =
+  System.get_env("GITHUB_CLIENT_SECRET") ||
+    raise """
+    environment variable GITHUB_CLIENT_SECRET is missing.
+    """
+
 # Configures the endpoint
 config :show_me_the_code, ShowMeTheCodeWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "NrstlVMR87dp0qpxK2Os/ZIoTO0NYA7MnOcePjlcqB9GXNVR3ppx6sQRrknvPNv2",
   render_errors: [view: ShowMeTheCodeWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: ShowMeTheCode.PubSub
+  pubsub_server: ShowMeTheCode.PubSub,
+  github_client_id: github_client_id,
+  github_client_secret: github_client_secret
 
 # Configures Elixir's Logger
 config :logger, :console,

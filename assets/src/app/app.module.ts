@@ -8,16 +8,16 @@ import { CodeService } from '../services/code.service';
 import { ConnectionService } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { TerminalService } from '../services/terminal.service';
+import { UserService } from '../services/user.service';
 
 import { AppComponent } from './app.component';
 import { PreferenceComponent } from './preference.component';
-import {ShelfComponent} from "./shelf.component";
+import { ShelfComponent } from './shelf.component';
 
 @NgModule({
   declarations: [AppComponent, ShelfComponent, PreferenceComponent],
   imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ToastrModule.forRoot()],
-  providers: [CodeService, ConnectionService, EditorService, TerminalService],
+  providers: [CodeService, ConnectionService, EditorService, UserService, TerminalService],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}
