@@ -1,6 +1,7 @@
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
@@ -73,7 +74,7 @@ export interface ISelectOption {
     `,
   ],
 })
-export class SelectComponent implements OnDestroy {
+export class SelectComponent implements AfterViewInit, OnDestroy {
   private overlayRef: OverlayRef | null = null;
 
   @ViewChild('input')
@@ -98,9 +99,13 @@ export class SelectComponent implements OnDestroy {
   @observable
   keyword = '';
 
+  @observable
+  focused = false;
+
   @computed
   get text(): string {
-    const option = this.options.find((it) => it.value === this.value);
+    const value = this.value;
+    const option = this.options.find((it) => it.value === value);
     return option?.text ?? '';
   }
 
@@ -134,11 +139,11 @@ export class SelectComponent implements OnDestroy {
 
   onFocus() {
     this.showOptions();
-    this.keyword = '';
+    this.focused = true;
   }
 
   onBlur() {
-    this.keyword = this.text;
+    this.focused = false;
     this.hideOptions();
   }
 
@@ -194,6 +199,22 @@ export class SelectComponent implements OnDestroy {
     e.preventDefault();
     this.valueChange.emit(option.value);
     this.inputRef?.blur();
+  }
+
+  ngAfterViewInit() {
+    this.keyword = this.text;
+    this.disposers.push(
+      observe(this, 'value', () => {
+        if (!this.focused) {
+          this.keyword = this.text;
+        }
+      }),
+      observe(this, 'focused', () => {
+        if (this.focused) {
+          this.keyword = '';
+        }
+      }),
+    );
   }
 
   ngOnDestroy(): void {

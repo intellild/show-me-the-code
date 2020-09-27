@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, TemplateRef, ViewChild } from '@angular/core';
-import { observable } from 'mobx-angular';
 
 @Component({
   selector: 'app-input',
@@ -52,7 +51,6 @@ export class InputComponent {
   @HostBinding('class.idle')
   idle = true;
 
-  @observable
   @HostBinding('class.synthetic-focus')
   focused = false;
 

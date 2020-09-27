@@ -19,11 +19,7 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   def connect(%{"token" => token}, socket, _connect_info) do
     client = Tentacat.Client.new(%{access_token: token})
     case Tentacat.Users.me(client) do
-      {200, %{"id" => user_id, "name" => username}, _} ->
-        socket = socket
-                 |> assign(:user_id, user_id)
-                 |> assign(:username, username)
-        {:ok, socket}
+      {200, %{"id" => user_id}, _} -> {:ok, assign(socket, :user_id, user_id)}
       {_, %{"message" => message}, _} -> {:error, message}
       _ -> {:error, "unknown"}
     end
