@@ -48,8 +48,11 @@ import { GithubService } from '../services/github.service';
     `
       :host {
         display: flex;
-        width: 600px;
         flex-direction: row;
+        align-items: stretch;
+        width: 800px;
+        height: 50vh;
+        min-height: 200px;
         padding: 20px;
       }
 
@@ -77,7 +80,7 @@ import { GithubService } from '../services/github.service';
       }
 
       .actions {
-        flex: 0 0 400px;
+        flex: 1 1;
       }
     `,
   ],
