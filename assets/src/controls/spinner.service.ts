@@ -27,7 +27,7 @@ export class SpinnerService {
 
   close() {
     this.spinning = Math.max(0, this.spinning - 1);
-    if (this.spinning === 0) {
+    if (this.spinning === 0 && this.overlayRef) {
       this.overlayRef.detach();
       this.overlayRef.dispose();
       this.overlayRef = null;

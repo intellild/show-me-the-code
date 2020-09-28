@@ -78,13 +78,13 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   private overlayRef: OverlayRef | null = null;
 
   @ViewChild('input')
-  inputRef: InputComponent;
+  inputRef: InputComponent | null = null;
 
   @observable
   active: number | null = null;
 
   @ViewChild('popup', { static: true })
-  optionsTemplateRef: TemplateRef<any>;
+  optionsTemplateRef: TemplateRef<any> | null = null;
 
   @Input()
   options: ISelectOption[] = [];
@@ -148,7 +148,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   }
 
   showOptions() {
-    if (this.overlayRef) {
+    if (this.overlayRef || !this.optionsTemplateRef) {
       return;
     }
     const portal = new TemplatePortal(this.optionsTemplateRef, this.viewContainerRef);

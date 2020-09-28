@@ -8,7 +8,7 @@ export interface IUser {
 
 export interface IGist {
   id: string;
-  name: string;
+  name: string | undefined;
   description: string;
   files: IGistFile[];
   isPublic: boolean;
@@ -17,7 +17,7 @@ export interface IGist {
 }
 
 export interface IGistFile {
-  filename: string;
-  type: string;
-  language: string;
+  filename: string | undefined;
+  type: string | undefined;
+  language: string | undefined;
 }

@@ -1,4 +1,6 @@
 import { AfterViewInit, Directive, Input, OnDestroy, ViewContainerRef } from '@angular/core';
+import { observe } from 'mobx';
+import { observable } from 'mobx-angular';
 import * as monaco from 'monaco-editor';
 
 @Directive({
@@ -7,11 +9,11 @@ import * as monaco from 'monaco-editor';
 export class EditorDirective implements AfterViewInit, OnDestroy {
   private editor: monaco.editor.IStandaloneCodeEditor | null = null;
   private resizeObserver: ResizeObserver;
+  private readonly $$: (() => void)[] = [];
 
   @Input()
-  model: monaco.editor.ITextModel;
-
-  private readonly disposers: (() => void)[] = [];
+  @observable.ref
+  model: monaco.editor.ITextModel | null = null;
 
   constructor(private readonly viewContainerRef: ViewContainerRef) {
     this.resizeObserver = new ResizeObserver(() => {
@@ -26,6 +28,11 @@ export class EditorDirective implements AfterViewInit, OnDestroy {
       theme: 'vs-dark',
     });
     this.resizeObserver.observe(element);
+    this.$$.push(
+      observe(this, 'model', () => {
+        this.editor?.setModel(this.model);
+      }),
+    );
   }
 
   ngOnDestroy(): void {

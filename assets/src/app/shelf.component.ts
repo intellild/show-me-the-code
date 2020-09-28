@@ -114,10 +114,13 @@ export class ShelfComponent implements AfterViewInit {
 
   @computed
   get targetGistList(): ISelectOption[] {
-    return this.list.map((it) => ({
-      value: it.id,
-      text: it.id === this.currentGist?.id ? `[Current Gist] ${it.name}` : it.name,
-    }));
+    return this.list.map((it) => {
+      const displayName = it.name ?? it.id;
+      return {
+        value: it.id,
+        text: it.id === this.currentGist?.id ? `[Current Gist] ${displayName}` : displayName,
+      };
+    });
   }
 
   constructor(

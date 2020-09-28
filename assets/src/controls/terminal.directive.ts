@@ -14,7 +14,6 @@ export class TerminalDirective implements AfterViewInit, OnDestroy {
   });
   private readonly fitAddon = new FitAddon();
   private readonly searchAddon = new SearchAddon();
-  private readonly $: Subscription;
   private readonly resizeObserver = new ResizeObserver(() => {
     this.fitAddon.fit();
   });
@@ -36,7 +35,6 @@ export class TerminalDirective implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.term.dispose();
-    this.$.unsubscribe();
     this.resizeObserver.disconnect();
   }
 }

@@ -10,7 +10,7 @@ export class DialogRef<T> {
     private readonly overlayRef: OverlayRef,
     component: ComponentType<T>,
     serviceInjector: Injector,
-    parentInjector?: Injector | null,
+    parentInjector?: Injector | undefined,
   ) {
     const injector = Injector.create({
       providers: [
@@ -56,7 +56,7 @@ export class DialogService {
     private readonly applicationRef: ApplicationRef,
   ) {}
 
-  open<T>(component: ComponentType<T>, injector?: Injector | null) {
+  open<T>(component: ComponentType<T>, injector?: Injector | undefined) {
     const overlayRef = this.overlay.create(
       new OverlayConfig({
         hasBackdrop: true,

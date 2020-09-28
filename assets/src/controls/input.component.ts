@@ -40,7 +40,7 @@ import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, Templa
 })
 export class InputComponent {
   @ViewChild('input', { static: true, read: ElementRef })
-  inputRef: ElementRef<HTMLInputElement>;
+  inputRef: ElementRef<HTMLInputElement> | null = null;
 
   @Input()
   placeholder = '';
@@ -67,7 +67,7 @@ export class InputComponent {
   valueChange = new EventEmitter<string>();
 
   @Input()
-  icon: TemplateRef<any>;
+  icon: TemplateRef<any> | null = null;
 
   onFocus(e: FocusEvent) {
     this.focused = true;
@@ -84,10 +84,10 @@ export class InputComponent {
   }
 
   focus() {
-    this.inputRef.nativeElement?.focus();
+    this.inputRef?.nativeElement?.focus();
   }
 
   blur() {
-    this.inputRef.nativeElement?.blur();
+    this.inputRef?.nativeElement?.blur();
   }
 }
