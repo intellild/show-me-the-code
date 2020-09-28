@@ -14,6 +14,7 @@ import { Component, Directive } from "@angular/core";
         font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: inline-block;
       }
 
       :host:hover {

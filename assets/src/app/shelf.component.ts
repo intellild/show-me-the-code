@@ -10,80 +10,8 @@ import { GithubService } from '../services/github.service';
 
 @Component({
   selector: 'app-shelf',
-  template: `
-    <div *mobxAutorun class="list synthetic-focus">
-      <div
-        *ngFor="let item of list"
-        class="item"
-        [class.active]="item.id === currentGist?.id"
-        (click)="onGistClick(item)"
-      >
-        {{ item.name }}
-      </div>
-    </div>
-    <div *mobxAutorun class="list synthetic-focus">
-      <ng-container *ngIf="currentGist !== null">
-        <div *ngFor="let file of currentGist.files" class="item" [class.active]="file === currentFile">
-          {{ file.filename }}
-        </div>
-      </ng-container>
-    </div>
-    <div *mobxAutorun class="actions">
-      <div>
-        <app-button>Create Empty</app-button>
-      </div>
-      <div>
-        <app-button>Open Selected File</app-button>
-      </div>
-      <div>
-        <app-button>Fork</app-button>
-        <div>
-          <label>Target Gist:</label>
-          <app-select *mobxAutorun [options]="targetGistList" [(value)]="targetGistId"></app-select>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      :host {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        width: 800px;
-        height: 50vh;
-        min-height: 200px;
-        padding: 20px;
-      }
-
-      .list {
-        overflow-x: hidden;
-        overflow-y: auto;
-        flex: 0 0 200px;
-        height: 100%;
-        background-color: rgb(27, 26, 25);
-        color: rgb(243, 242, 241);
-      }
-
-      .item {
-        height: 42px;
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
-      }
-
-      .item.active,
-      .item:hover {
-        cursor: pointer;
-        background: rgb(37, 36, 35);
-        color: rgb(243, 242, 241);
-      }
-
-      .actions {
-        flex: 1 1;
-      }
-    `,
-  ],
+  templateUrl: './shelf.component.html',
+  styleUrls: ['./shelf.component.scss']
 })
 export class ShelfComponent implements AfterViewInit {
   readonly tabs: ITab[] = [
@@ -112,6 +40,9 @@ export class ShelfComponent implements AfterViewInit {
   @observable
   targetGistId: string | null = null;
 
+  @observable
+  targetCurrentGist = true;
+
   @computed
   get targetGistList(): ISelectOption[] {
     return this.list.map((it) => {
@@ -131,13 +62,13 @@ export class ShelfComponent implements AfterViewInit {
   ) {}
 
   async ngAfterViewInit() {
-    this.spinnerService.open();
-    this.list = await this.githubService.getGists(0);
-    this.spinnerService.close();
+    // this.spinnerService.open();
+    // this.list = await this.githubService.getGists(0);
+    // this.spinnerService.close();
   }
 
   onGistClick(gist: IGist) {
-    if (!this.targetGistId || this.currentGist?.id === this.targetGistId) {
+    if (this.targetCurrentGist) {
       this.targetGistId = gist.id;
     }
     this.currentGist = gist;

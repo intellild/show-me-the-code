@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MobxAngularModule } from 'mobx-angular';
 import { TerminalService } from '../services/terminal.service';
 import { ButtonComponent } from './button.component';
+import { CheckboxComponent } from "./checkbox.component";
 import { EditorDirective } from './editor.directive';
 import { InputComponent } from './input.component';
 import { PopDirective } from './pop.directive';
@@ -20,6 +21,7 @@ import { DialogService } from './dialog.service';
 @NgModule({
   declarations: [
     ButtonComponent,
+    CheckboxComponent,
     DialogComponent,
     EditorDirective,
     InputComponent,
@@ -33,6 +35,7 @@ import { DialogService } from './dialog.service';
   providers: [DialogService, SpinnerService, TerminalService],
   exports: [
     ButtonComponent,
+    CheckboxComponent,
     EditorDirective,
     InputComponent,
     PopDirective,
