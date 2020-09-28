@@ -9,7 +9,7 @@ defmodule ShowMeTheCode.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      ShowMeTheCode.Repo,
+#      ShowMeTheCode.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: ShowMeTheCode.PubSub},
       ShowMeTheCode.Room.Presence,
