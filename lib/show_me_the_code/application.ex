@@ -9,7 +9,7 @@ defmodule ShowMeTheCode.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-#      ShowMeTheCode.Repo,
+      #      ShowMeTheCode.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: ShowMeTheCode.PubSub},
       ShowMeTheCode.Room.Presence,
@@ -17,9 +17,9 @@ defmodule ShowMeTheCode.Application do
       ShowMeTheCodeWeb.Endpoint,
       # Starts a worker by calling: ShowMeTheCode.Worker.start_link(arg)
       # {ShowMeTheCode.Worker, arg},
-      {ShowMeTheCode.Room.Registry, name: ShowMeTheCode.Room.Registry},
-      {ShowMeTheCode.Room.Watcher, name: ShowMeTheCode.Room.Watcher},
-      {DynamicSupervisor, name: ShowMeTheCode.Room.Supervisor, strategy: :one_for_one}
+      ShowMeTheCode.Room.Registry
+      #      {ShowMeTheCode.Room.Watcher, name: ShowMeTheCode.Room.Watcher},
+      #      {DynamicSupervisor, name: ShowMeTheCode.Room.Supervisor, strategy: :one_for_one}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

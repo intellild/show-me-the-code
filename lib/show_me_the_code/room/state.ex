@@ -6,16 +6,18 @@ defmodule ShowMeTheCode.Room.State do
   end
 
   def join(s, user_id) do
-    get_and_update(
+    Agent.get_and_update(
       s,
-      fn {:running, granted, slots} ->
-        if MapSet.member?(granted, user_id) do
-          case slots do
-            [slot | rest] -> {{:ok, slot}, {:running, granted, rest}}
-            _ -> {{:error, :full}, state}
-          end
-        else
-          {{:error, :unauthorized}, state}
+      fn state ->
+        case state do
+          {:stopping, _, _} -> {{:error, :stopping}, state}
+          {_, _, []} -> {{:error, :room_full}, state}
+          {status, granted, [slot | rest]} ->
+            if MapSet.member?(granted, user_id) do
+              {{:ok, slot}, {status, granted, rest}}
+            else
+              {{:error, :unauthorized}, state}
+            end
         end
       end
     )
@@ -29,15 +31,7 @@ defmodule ShowMeTheCode.Room.State do
     Agent.update(s, fn {status, granted, slots} -> {status, granted, [slot | slots]}  end)
   end
 
-  defp get_and_update(s, f) do
-    Agent.get_and_update(
-      s,
-      fn state ->
-        case state do
-          {:stopping, _, _} -> {{:error, :stopping}, state}
-          _ -> f(state)
-        end
-      end
-    )
+  def stopping(s) do
+    Agent.update(s, fn {_, granted, slots} -> {:stopping, granted, slots} end)
   end
 end

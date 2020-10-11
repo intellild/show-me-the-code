@@ -16,11 +16,7 @@ defmodule ShowMeTheCodeWeb.UserChannel do
   end
 
   def handle_in("open", %{"id" => id}, socket) do
-    if Registry.open(id, socket.assigns.user_id) do
-      {:reply, :ok, socket}
-    else
-      {:reply, {:error, "Room already exist"}, socket}
-    end
+    {:reply, Registry.open(id, socket.assigns.user_id), socket}
   end
 
   def handle_in("join.response", %{"user_id" => user_id, "accept" => accept, "room_id" => room_id}, socket) do
@@ -41,7 +37,7 @@ defmodule ShowMeTheCodeWeb.UserChannel do
       end
       Presence.list("user:#{owner}")
     catch
-      :not_exist -> {:reply, {:error, "not exist"}, socket}
+      :not_exist -> {:reply, {:error, :not_exist}, socket}
       :ok -> {:reply, :ok, socket}
     end
   end
