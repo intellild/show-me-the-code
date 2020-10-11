@@ -153,3 +153,6 @@ lib/bs
 *.proto.js
 assets/src/serializers/index.d.ts
 .merlin
+
+.elixir_ls
+config/dev.secret.exs

@@ -24,12 +24,26 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
+github_client_id =
+  System.get_env("GITHUB_CLIENT_ID") ||
+    raise """
+    environment variable GITHUB_CLIENT_ID is missing.
+    """
+
+github_client_secret =
+  System.get_env("GITHUB_CLIENT_SECRET") ||
+    raise """
+    environment variable GITHUB_CLIENT_SECRET is missing.
+    """
+
 config :show_me_the_code,
        ShowMeTheCodeWeb.Endpoint,
        http: [
          port: String.to_integer(System.get_env("PORT") || "4000")
        ],
-       secret_key_base: secret_key_base
+       secret_key_base: secret_key_base,
+       github_client_id: github_client_id,
+       github_client_secret: github_client_secret
 
 # ## Using releases (Elixir v1.9+)
 #
