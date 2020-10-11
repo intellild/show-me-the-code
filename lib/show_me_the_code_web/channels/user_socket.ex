@@ -19,11 +19,21 @@ defmodule ShowMeTheCodeWeb.UserSocket do
   def connect(%{"token" => token}, socket, _connect_info) do
     client = Tentacat.Client.new(%{access_token: token})
     case Tentacat.Users.me(client) do
-      {200, %{"id" => user_id}, _} -> {:ok, assign(socket, :user_id, user_id)}
+      {200, %{"id" => user_id}, _} ->
+        state = ShowMeTheCode.User.State.start_link()
+        {
+          :ok,
+          assign(
+            socket,
+            %{
+              :user_id => user_id,
+              :state => state
+            }
+          )
+        }
       {_, %{"message" => message}, _} -> {:error, message}
       _ -> {:error, "unknown"}
     end
-
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

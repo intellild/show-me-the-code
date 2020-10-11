@@ -1,45 +1,27 @@
 defmodule ShowMeTheCode.Room.Registry do
-  use GenServer
-
-  alias ShowMeTheCode.Room.Bucket
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  def init() do
+    :ets.new(__MODULE__, [:public, :named_table])
   end
 
-  @impl true
-  def init(:ok) do
-    {:ok, {%{}, %{}}}
+  def open(id, owner_id) do
+    :ets.insert_new(__MODULE__, {id, owner_id})
   end
 
-  @impl true
-  def handle_call({:get_or_create, room_id}, _from, {rooms, refs}) do
-    room = Map.get(rooms, room_id)
-
-    if room != nil do
-      {:reply, room, {rooms, refs}}
-    else
-      {:ok, room} = DynamicSupervisor.start_child(ShowMeTheCode.Room.Supervisor, Bucket)
-
-      ref = Process.monitor(room)
-      {:reply, room, {Map.put(rooms, room_id, room), Map.put(refs, ref, room_id)}}
+  def is_owner(id, user_id) do
+    case :ets.lookup(__MODULE__, id) do
+      [{_, owner_id}] -> owner_id == user_id
+      _ -> false
     end
   end
 
-  @impl true
-  def handle_cast({:DOWN, ref, :process, _pid, _reason}, {rooms, refs}) do
-    {room_id, refs} = Map.pop(refs, ref)
-    {room_pid, rooms} = Map.pop(rooms, room_id)
-    :ok = DynamicSupervisor.terminate_child(room_pid)
-    {:noreply, {rooms, refs}}
+  def get_owner(id) do
+    case :ets.lookup(__MODULE__, id) do
+      [{_, owner_id}] -> owner_id
+      _ -> nil
+    end
   end
 
-  @impl true
-  def handle_info(_msg, state) do
-    {:noreply, state}
-  end
-
-  def get_or_create(registry, room_id) do
-    GenServer.call(registry, {:get_or_create, room_id})
+  def delete(id) do
+    :ets.delete(__MODULE__, id)
   end
 end
