@@ -1,9 +1,23 @@
-import { BehaviorSubject } from 'rxjs';
 import * as EventEmitter from 'eventemitter3';
 import { Channel } from 'phoenix';
+import { BehaviorSubject } from 'rxjs';
 
 export function update<T>(updater: (value: T) => T, value$: BehaviorSubject<T>) {
   value$.next(updater(value$.getValue()));
+}
+
+export function call<T extends object, R = void>(channel: Channel | null, event: string, payload: T): Promise<R> {
+  if (!channel) {
+    return Promise.reject(new Error('unconnected'));
+  }
+  return new Promise((resolve, reject) => {
+    channel
+      .push(event, payload)
+      .receive('ok', resolve)
+      .receive('error', ({ reason }) => {
+        reject(new Error(reason));
+      });
+  });
 }
 
 export function linkEvents(events: string[], channel: Channel, target: EventEmitter<string>) {

@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import * as monaco from 'monaco-editor';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
-import { EditorService } from './editor.service';
-import { ConnectionService, ISocketEvents } from './connection.service';
-import { Proto } from '../serializers';
-import { decodeArrayBuffer, encodeArrayBuffer } from '../utils';
 // import { MessageService } from 'primeng/api';
 import { debounceTime } from 'rxjs/operators';
+import { Proto } from '../serializers';
+import { decodeArrayBuffer, encodeArrayBuffer } from '../utils';
+import { ConnectionService, ISocketEvents } from './connection.service';
+import { EditorService } from './editor.service';
 
 function deserializeRange({ startColumn, startLineNumber, endColumn, endLineNumber }: monaco.IRange): monaco.Range {
   return new monaco.Range(startLineNumber, startColumn, endLineNumber, endColumn);

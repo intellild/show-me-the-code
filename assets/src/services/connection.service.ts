@@ -1,13 +1,12 @@
-import { observable } from 'mobx-angular';
-import { Socket, Channel, Presence } from 'phoenix';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import * as EventEmitter from 'eventemitter3';
-import { SpinnerService } from '../controls/spinner.service';
+import { observable } from 'mobx-angular';
+import { Channel, Socket } from 'phoenix';
+import { BehaviorSubject } from 'rxjs';
 import { environment } from '../environments/environment';
 import { IUser } from '../models';
-import { linkEvents, unlinkEvents } from '../utils';
-import { GithubService } from './github.service';
+import { call, unlinkEvents } from '../utils';
+import { GithubService, token } from './github.service';
 
 const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
 
@@ -41,7 +40,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   private readonly socket = new Socket(url, {
     heartbeatIntervalMs: 30000,
     params: {
-      // token,
+      token,
     },
   });
 
@@ -70,7 +69,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     super();
   }
 
-  connect(user: IUser) {``
+  connect(user: IUser) {
     this.socket.onOpen(() => {
       this.connectState$.next(ConnectState.Connected);
       this.userChannel = this.socket.channel(`user:${user.id}`);
@@ -83,17 +82,27 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
           console.error('Fatal');
         });
     });
-    this.socket.connect({
-      token: this.githubService.token,
-    });
+    this.socket.connect();
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {
     this.roomChannel?.push(event, payload);
   }
 
-  join(roomId: string, username: string): Promise<void> {
-    // const channel = socket.channel(`room:${roomId}`);
+  async open(id: string): Promise<void> {
+    await this.create(id);
+    const channel = this.socket.channel(`room:${id}`);
+    await this.joinChannel(channel);
+  }
+
+  async requestJoin(id: string) {
+    return call(this.userChannel, 'join.request', { id });
+  }
+
+  async join(id: string): Promise<void> {
+    await this.requestJoin(id);
+    // const channel = this.socket.channel(`room:${id}`);
+    // await this.joinChannel(channel);
     // const links = linkEvents(EVENTS, channel, this as EventEmitter<string>);
     // const presence = new Presence(channel);
     // presence.onSync(() => {
@@ -106,15 +115,6 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     // }
     // });
     // presence.onLeave((userId) => this.emit('user.leave', { userId }));
-    return new Promise<void>((resolve, reject) => {
-      // channel
-      //   .join()
-      //   .receive('ok', ({ userId }: { userId: string }) => {
-      //     this.updateUrl();
-      //     resolve();
-      //   })
-      //   .receive('error', (msg) => this.handleJoinError(msg, links, channel, reject));
-    });
   }
 
   save(content: string, language: string): Promise<void> {
@@ -130,6 +130,22 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
       //   })
       //   .receive('ok', resolve)
       //   .receive('error', reject);
+    });
+  }
+
+  private create(id: string): Promise<void> {
+    return call(this.userChannel, 'open', { id });
+  }
+
+  private async joinChannel(channel: Channel): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      channel
+        .join()
+        .receive('ok', () => {
+          this.roomChannel = channel;
+          resolve();
+        })
+        .receive('error', ({ reason }) => reject(new Error(reason)));
     });
   }
 

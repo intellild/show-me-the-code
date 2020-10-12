@@ -3,6 +3,17 @@ import { Octokit } from '@octokit/rest';
 import * as Cookie from 'cookie';
 import { IGist, IGistFile, IUser } from '../models';
 
+export const token = Cookie.parse(document.cookie).github_token;
+
+function auth(): never {
+  location.href = '/api/auth/github';
+  throw new Error('auth');
+}
+
+if (!token) {
+  auth();
+}
+
 @Injectable()
 export class GithubService {
   private readonly client: Octokit;
@@ -10,9 +21,8 @@ export class GithubService {
   public readonly token: string;
 
   constructor() {
-    const token = this.getToken();
     if (!token) {
-      this.auth();
+      auth();
     }
     this.token = token;
     this.client = new Octokit({
@@ -24,7 +34,7 @@ export class GithubService {
     if (!this.user) {
       const { data, status } = await this.client.users.getAuthenticated();
       if (status !== 200) {
-        this.auth();
+        auth();
       }
       this.user = {
         id: data.id,
@@ -63,14 +73,5 @@ export class GithubService {
         files,
       };
     });
-  }
-
-  private getToken(): string | undefined {
-    return Cookie.parse(document.cookie).github_token;
-  }
-
-  private auth(): never {
-    location.href = '/api/auth/github';
-    throw new Error('auth');
   }
 }

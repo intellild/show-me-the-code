@@ -11,7 +11,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { observe } from 'mobx';
-import { observable } from "mobx-angular";
+import { observable } from 'mobx-angular';
 import { Subscription } from 'rxjs';
 
 @Directive({

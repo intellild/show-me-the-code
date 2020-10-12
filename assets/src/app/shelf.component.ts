@@ -6,12 +6,13 @@ import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { ITab } from '../controls/tabs.component';
 import { IGist, IGistFile } from '../models';
+import { ConnectionService } from '../services/connection.service';
 import { GithubService } from '../services/github.service';
 
 @Component({
   selector: 'app-shelf',
   templateUrl: './shelf.component.html',
-  styleUrls: ['./shelf.component.scss']
+  styleUrls: ['./shelf.component.scss'],
 })
 export class ShelfComponent implements AfterViewInit {
   readonly tabs: ITab[] = [
@@ -43,6 +44,9 @@ export class ShelfComponent implements AfterViewInit {
   @observable
   targetCurrentGist = true;
 
+  @observable
+  alias = '';
+
   @computed
   get targetGistList(): ISelectOption[] {
     return this.list.map((it) => {
@@ -59,12 +63,17 @@ export class ShelfComponent implements AfterViewInit {
     private readonly dialogRef: DialogRef<ShelfComponent>,
     private readonly githubService: GithubService,
     private readonly spinnerService: SpinnerService,
+    private readonly connectionService: ConnectionService,
   ) {}
 
-  async ngAfterViewInit() {
-    // this.spinnerService.open();
-    // this.list = await this.githubService.getGists(0);
-    // this.spinnerService.close();
+  ngAfterViewInit() {
+    // this.loadGists();
+  }
+
+  async loadGists() {
+    this.spinnerService.open();
+    this.list = await this.githubService.getGists(0);
+    this.spinnerService.close();
   }
 
   onGistClick(gist: IGist) {
@@ -72,5 +81,26 @@ export class ShelfComponent implements AfterViewInit {
       this.targetGistId = gist.id;
     }
     this.currentGist = gist;
+  }
+
+  async open() {
+    if (!this.alias) {
+      return;
+    }
+    try {
+      await this.connectionService.open(this.alias);
+    } catch (e) {
+      console.error(e.message);
+    }
+  }
+
+  async join() {
+    try {
+      this.spinnerService.open('Requesting');
+      await this.connectionService.requestJoin(this.alias);
+    } catch (e) {
+      console.error(e)
+      this.spinnerService.close();
+    }
   }
 }

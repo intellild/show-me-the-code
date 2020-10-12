@@ -15,13 +15,13 @@ defmodule ShowMeTheCode.Room.Registry do
   end
 
   def open(id, owner_id) do
-    pid = DynamicSupervisor.start_child(__MODULE__, State)
+    {:ok, pid} = DynamicSupervisor.start_child(__MODULE__, State)
     if :ets.insert_new(__MODULE__, {id, owner_id, pid}) do
       State.grant(pid, owner_id)
-      {:ok}
+      :ok
     else
       DynamicSupervisor.stop(__MODULE__, pid)
-      {:error, :not_exist}
+      Utils.error(:not_exist)
     end
   end
 
@@ -32,10 +32,17 @@ defmodule ShowMeTheCode.Room.Registry do
     end
   end
 
+  def grant(id, user_id) do
+    case :ets.lookup(__MODULE__, id) do
+      [{_, _, pid}] -> State.grant(pid, user_id)
+      _ -> Utils.error(:not_exist)
+    end
+  end
+
   def join(id, user_id) do
     case :ets.lookup(__MODULE__, id) do
       [{_, _, pid}] -> State.join(pid, user_id)
-      _ -> {:error, :not_exist}
+      _ -> Utils.error(:not_exist)
     end
   end
 

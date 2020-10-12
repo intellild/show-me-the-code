@@ -1,5 +1,5 @@
-import { Component, Inject, InjectionToken } from '@angular/core';
 import { Portal } from '@angular/cdk/portal';
+import { Component, Inject, InjectionToken } from '@angular/core';
 
 export const DialogContentToken = new InjectionToken('DIALOG_CONTENT');
 

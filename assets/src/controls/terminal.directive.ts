@@ -1,5 +1,4 @@
 import { AfterViewInit, Directive, OnDestroy, ViewContainerRef } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { SearchAddon } from 'xterm-addon-search';

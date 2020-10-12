@@ -1,13 +1,16 @@
-import { Component } from "@angular/core";
+import { Component, Inject, InjectionToken, Injector } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+export const SpinnerTextToken = new InjectionToken('SPINNER_TEXT');
 
 @Component({
   selector: 'app-spinner',
-  template:
-      `
+  template: `
     <div class="circle"></div>
+    <div>{{ text$ | async }}</div>
   `,
   styles: [
-      `
+    `
       :host {
         display: flex;
         flex-direction: column;
@@ -39,10 +42,9 @@ import { Component } from "@angular/core";
         width: 40px;
         height: 40px;
       }
-
-    `
-  ]
+    `,
+  ],
 })
 export class SpinnerComponent {
-
+  constructor(@Inject(SpinnerTextToken) readonly text$: BehaviorSubject<string>) {}
 }

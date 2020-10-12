@@ -1,18 +1,31 @@
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { Injectable } from '@angular/core';
-import { SpinnerComponent } from './spinner.component';
+import { Injectable, Injector } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { SpinnerComponent, SpinnerTextToken } from './spinner.component';
 
 @Injectable()
 export class SpinnerService {
-  private spinning = 0;
-  private readonly portal = new ComponentPortal(SpinnerComponent);
+  private readonly portal: ComponentPortal<SpinnerComponent>;
   private overlayRef: OverlayRef | null = null;
+  private readonly injector: Injector;
+  private readonly text$ = new BehaviorSubject('');
 
-  constructor(private readonly overlay: Overlay) {}
+  constructor(private readonly overlay: Overlay, injector: Injector) {
+    this.injector = Injector.create({
+      providers: [
+        {
+          provide: SpinnerTextToken,
+          useValue: this.text$,
+        },
+      ],
+      parent: injector,
+    });
+    this.portal = new ComponentPortal(SpinnerComponent, null, this.injector);
+  }
 
-  open() {
-    this.spinning += 1;
+  open(text = '') {
+    this.text$.next(text);
     if (!this.overlayRef) {
       this.overlayRef = this.overlay.create(
         new OverlayConfig({
@@ -26,8 +39,7 @@ export class SpinnerService {
   }
 
   close() {
-    this.spinning = Math.max(0, this.spinning - 1);
-    if (this.spinning === 0 && this.overlayRef) {
+    if (this.overlayRef) {
       this.overlayRef.detach();
       this.overlayRef.dispose();
       this.overlayRef = null;
