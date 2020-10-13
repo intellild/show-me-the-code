@@ -5,9 +5,8 @@ import { IGist, IGistFile, IUser } from '../models';
 
 export const token = Cookie.parse(document.cookie).github_token;
 
-function auth(): never {
+function auth() {
   location.href = '/api/auth/github';
-  throw new Error('auth');
 }
 
 if (!token) {
@@ -21,9 +20,6 @@ export class GithubService {
   public readonly token: string;
 
   constructor() {
-    if (!token) {
-      auth();
-    }
     this.token = token;
     this.client = new Octokit({
       auth: token,
@@ -35,6 +31,7 @@ export class GithubService {
       const { data, status } = await this.client.users.getAuthenticated();
       if (status !== 200) {
         auth();
+        throw new Error('Unauthorized');
       }
       this.user = {
         id: data.id,
