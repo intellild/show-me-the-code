@@ -1,13 +1,11 @@
-import { Component, Inject, InjectionToken, Injector } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-export const SpinnerTextToken = new InjectionToken('SPINNER_TEXT');
+import { Component } from '@angular/core';
+import { SpinnerService } from './spinner.service';
 
 @Component({
   selector: 'app-spinner',
   template: `
     <div class="circle"></div>
-    <div>{{ text$ | async }}</div>
+    <div *mobxAutorun class="text">{{ text }}</div>
   `,
   styles: [
     `
@@ -42,9 +40,17 @@ export const SpinnerTextToken = new InjectionToken('SPINNER_TEXT');
         width: 40px;
         height: 40px;
       }
+
+      .text {
+        margin-top: 10px;
+      }
     `,
   ],
 })
 export class SpinnerComponent {
-  constructor(@Inject(SpinnerTextToken) readonly text$: BehaviorSubject<string>) {}
+  get text() {
+    return this.spinnerService.text;
+  }
+
+  constructor(private readonly spinnerService: SpinnerService) {}
 }

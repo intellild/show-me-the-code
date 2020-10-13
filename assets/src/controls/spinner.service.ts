@@ -1,31 +1,21 @@
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { Injectable, Injector } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { SpinnerComponent, SpinnerTextToken } from './spinner.component';
+import { ApplicationRef, Injectable } from '@angular/core';
+import { observable } from 'mobx-angular';
+import { SpinnerComponent } from './spinner.component';
 
 @Injectable()
 export class SpinnerService {
-  private readonly portal: ComponentPortal<SpinnerComponent>;
+  private readonly portal = new ComponentPortal(SpinnerComponent);
   private overlayRef: OverlayRef | null = null;
-  private readonly injector: Injector;
-  private readonly text$ = new BehaviorSubject('');
 
-  constructor(private readonly overlay: Overlay, injector: Injector) {
-    this.injector = Injector.create({
-      providers: [
-        {
-          provide: SpinnerTextToken,
-          useValue: this.text$,
-        },
-      ],
-      parent: injector,
-    });
-    this.portal = new ComponentPortal(SpinnerComponent, null, this.injector);
-  }
+  @observable
+  text = '';
+
+  constructor(private readonly overlay: Overlay, private readonly applicationRef: ApplicationRef) {}
 
   open(text = '') {
-    this.text$.next(text);
+    this.text = text;
     if (!this.overlayRef) {
       this.overlayRef = this.overlay.create(
         new OverlayConfig({
@@ -34,6 +24,7 @@ export class SpinnerService {
         }),
       );
       this.overlayRef.attach(this.portal);
+      requestAnimationFrame(() => this.applicationRef.tick());
       this.overlayRef.updatePosition();
     }
   }
@@ -43,6 +34,7 @@ export class SpinnerService {
       this.overlayRef.detach();
       this.overlayRef.dispose();
       this.overlayRef = null;
+      this.text = '';
     }
   }
 }
