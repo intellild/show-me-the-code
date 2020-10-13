@@ -13,6 +13,7 @@ defmodule ShowMeTheCode.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: ShowMeTheCode.PubSub},
       ShowMeTheCode.Room.Presence,
+      ShowMeTheCode.User.Presence,
       # Start the endpoint when the application starts
       ShowMeTheCodeWeb.Endpoint,
       # Starts a worker by calling: ShowMeTheCode.Worker.start_link(arg)
