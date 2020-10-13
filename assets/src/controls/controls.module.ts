@@ -9,6 +9,9 @@ import { ButtonComponent } from './button.component';
 import { CheckboxComponent } from "./checkbox.component";
 import { EditorDirective } from './editor.directive';
 import { InputComponent } from './input.component';
+import { NotificationListComponent } from "./notification-list.component";
+import { NotificationComponent } from "./notification.component";
+import { NotificationService } from "./notification.service";
 import { PopDirective } from './pop.directive';
 import { SelectComponent } from './select.component';
 import { SpinnerComponent } from './spinner.component';
@@ -25,6 +28,8 @@ import { DialogService } from './dialog.service';
     DialogComponent,
     EditorDirective,
     InputComponent,
+    NotificationComponent,
+    NotificationListComponent,
     PopDirective,
     SelectComponent,
     SpinnerComponent,
@@ -32,7 +37,7 @@ import { DialogService } from './dialog.service';
     TerminalDirective,
   ],
   imports: [BrowserModule, BrowserAnimationsModule, MobxAngularModule, OverlayModule, PortalModule],
-  providers: [DialogService, SpinnerService, TerminalService],
+  providers: [DialogService, NotificationService, SpinnerService, TerminalService],
   exports: [
     ButtonComponent,
     CheckboxComponent,
