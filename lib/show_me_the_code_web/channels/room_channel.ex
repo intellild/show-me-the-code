@@ -24,8 +24,8 @@ defmodule ShowMeTheCodeWeb.RoomChannel do
     {:ok, socket}
   end
 
-  def handle_out("shutdown", reason, socket) do
-    {:stop, {:shutdown, reason}, socket}
+  def handle_out("shutdown", msg, socket) do
+    {:stop, {:shutdown, msg}, socket}
   end
 
   #  def handle_in(
@@ -76,7 +76,7 @@ defmodule ShowMeTheCodeWeb.RoomChannel do
 
   defp client_leave(socket) do
     list = Presence.list(socket)
-    if map_size(list) == 0 do
+    if map_size(list) <= 1 do
       "room:" <> id = socket.topic
       Registry.close(id)
     end

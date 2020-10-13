@@ -21,7 +21,7 @@ defmodule ShowMeTheCode.Room.Registry do
       :ok
     else
       DynamicSupervisor.stop(__MODULE__, pid)
-      Utils.error(:not_exist)
+      Utils.error(:already_exist)
     end
   end
 
@@ -51,7 +51,7 @@ defmodule ShowMeTheCode.Room.Registry do
       [{_, _, pid}] ->
         :ets.delete(__MODULE__, id)
         :ok = State.stopping(pid)
-        Endpoint.broadcast("room:#{id}", "shutdown", :room_empty)
+        Endpoint.broadcast("room:#{id}", "shutdown", %{:reason => :room_empty})
         DynamicSupervisor.terminate_child(__MODULE__, pid)
       _ -> {}
     end
