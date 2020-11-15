@@ -7,19 +7,21 @@ import { NotificationRef } from './notification.service';
     <div class="message">{{ message }}</div>
     <div *ngIf="accept && reject" class="action">
       <app-button>Accept</app-button>
-      <app-button>Reject</app-button>
+      <app-button (click)="close()">Reject</app-button>
     </div>
   `,
   styles: [
     `
       :host {
         display: flex;
+        flex-direction: column;
         padding: 10px 5px;
         box-sizing: border-box;
         color: rgb(204, 204, 204);
         background: rgb(37, 37, 38);
         width: 450px;
         box-shadow: rgb(0, 0, 0) 0 0 8px;
+        margin-bottom: 10px;
       }
 
       :host:hover {
@@ -52,5 +54,9 @@ export class NotificationComponent {
 
   get reject() {
     return this.notification?.reject ?? false;
+  }
+
+  close() {
+    this.notification?.close();
   }
 }

@@ -29,7 +29,9 @@ export class NotificationRef extends EventEmitter<'accept' | 'reject' | 'clone'>
     this.reject = reject;
   }
 
-  close() {}
+  close() {
+    this.notificationService.remove(this);
+  }
 }
 
 @Injectable()
@@ -47,6 +49,13 @@ export class NotificationService {
     const notification = new NotificationRef(this, options);
     this.list.unshift(notification);
     return notification;
+  }
+
+  remove(ref: NotificationRef) {
+    const index = this.list.indexOf(ref);
+    if (index !== -1) {
+      this.list.splice(index, 1);
+    }
   }
 
   private ensureContainer() {

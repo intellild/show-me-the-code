@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { NotificationService } from './notification.service';
+import { animate, stagger, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-notification-list',
   template: `
     <ng-container *mobxAutorun>
-      <app-notification *ngFor="let it of list" [notification]="it"></app-notification>
+      <app-notification @listItemTrigger *ngFor="let it of list" [notification]="it"></app-notification>
     </ng-container>
   `,
   styles: [
@@ -13,9 +14,17 @@ import { NotificationService } from './notification.service';
       :host {
         width: 450px;
         overflow: visible;
-        transform: translateX(100%);
       }
     `,
+  ],
+  animations: [
+    trigger('listItemTrigger', [
+      transition(':enter', [style({ transform: 'translateX(100%)' }), animate('200ms 100ms ease-out')]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ transform: 'translateX(100%)' })),
+        animate('100ms 150ms ease-in', style({ height: '0' })),
+      ]),
+    ]),
   ],
 })
 export class NotificationListComponent {
