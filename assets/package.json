@@ -4,7 +4,7 @@
   "scripts": {
     "proto:gen": "pbjs -t static-module -w es6 -o src/serializers/index.proto.js src/serializers/*.proto && pbts -o src/serializers/index.d.ts src/serializers/index.proto.js",
     "ng": "ng",
-    "start": "ng serve --plugin ~build-plugin.js",
+    "start": "ng serve --plugin ~build-plugin.js --hmr",
     "build": "ng build --prod --plugin ~build-plugin.js",
     "test": "ng test",
     "lint": "ng lint",

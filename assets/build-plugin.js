@@ -10,7 +10,7 @@ exports.default = {
       }),
     );
     for (const rule of cfg.module.rules) {
-      if (rule.test.toString() === '/\\.css$/' && rule.exclude) {
+      if (rule.test?.toString() === '/\\.css$/' && rule.exclude) {
         rule.exclude.push(/monaco-editor/);
         break;
       }
