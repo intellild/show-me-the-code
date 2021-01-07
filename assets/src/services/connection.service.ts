@@ -5,14 +5,9 @@ import { Channel, Socket } from 'phoenix';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../environments/environment';
 import { IUser } from '../models';
-import { call, unlinkEvents } from '../utils';
+// import { call, unlinkEvents } from '../utils';
 import { GithubService, token } from './github.service';
-
-const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-
-const url = environment.production
-  ? `${protocol}://socket.icode.live/socket`
-  : `${protocol}://${location.hostname}:4000/socket`;
+import { WebSocketConnection } from './WebSocketConnection';
 
 export interface ISocketEvents {
   'sync.full': { content: string; language: string; expires: string | null };
@@ -33,19 +28,21 @@ export enum ConnectState {
   JoinSuccess = 'join-success',
 }
 
+export enum JoinState {
+  Connecting,
+  WaitingForAccept,
+  Accepted,
+}
+
 @Injectable()
 export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   public readonly connectState$ = new BehaviorSubject(ConnectState.Connecting);
 
-  private readonly socket = new Socket(url, {
-    heartbeatIntervalMs: 30000,
-    params: {
-      token,
-    },
-  });
+  private serverConnection: WebSocketConnection | null = null;
 
-  private userChannel: Channel | null = null;
+  // private userChannel: Channel | null = null;
   private roomChannel: Channel | null = null;
+  private pendingJoin$: BehaviorSubject<JoinState> | null = null;
 
   @observable
   users: IUser[] = [];
@@ -70,37 +67,48 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   }
 
   connect(user: IUser) {
-    this.socket.onOpen(() => {
-      this.connectState$.next(ConnectState.Connected);
-      this.userChannel = this.socket.channel(`user:${user.id}`);
-      this.userChannel
-        .join()
-        .receive('ok', () => {
-          this.connectState$.next(ConnectState.LoginSuccess);
-        })
-        .receive('error', () => {
-          console.error('Fatal');
-        });
-    });
-    this.socket.connect();
+    this.serverConnection = new WebSocketConnection(user);
+    this.serverConnection
+      .on('open', () => {
+        this.connectState$.next(ConnectState.Connected);
+      })
+      .on('login:ok', () => {
+        this.connectState$.next(ConnectState.LoginSuccess);
+      });
   }
 
   push<K extends keyof ISocketEvents>(event: K, payload: ISocketEvents[K]) {
-    this.roomChannel?.push(event, payload);
+    // this.roomChannel?.push(event, payload);
   }
 
   async open(id: string): Promise<void> {
+    if (!this.serverConnection) {
+      throw new Error('not connected');
+    }
     await this.create(id);
-    const channel = this.socket.channel(`room:${id}`);
-    await this.joinChannel(channel);
+    this.roomChannel = await this.serverConnection.room(`room:${id}`);
+    this.connectState$.next(ConnectState.JoinSuccess);
   }
 
-  async requestJoin(id: string) {
-    return call(this.userChannel, 'join.request', { id });
+  public requestJoin(id: string): BehaviorSubject<JoinState> {
+    if (!this.serverConnection) {
+      throw new Error('not connected');
+    }
+    const state$ = new BehaviorSubject(JoinState.Connecting);
+    this.pendingJoin$ = state$;
+    this.serverConnection.call('join:request', { id }).then(
+      () => state$.next(JoinState.WaitingForAccept),
+      (error) => {
+        state$.error(error);
+        this.pendingJoin$ = null;
+      },
+    );
+    return state$;
   }
 
   async join(id: string): Promise<void> {
     await this.requestJoin(id);
+
     // const channel = this.socket.channel(`room:${id}`);
     // await this.joinChannel(channel);
     // const links = linkEvents(EVENTS, channel, this as EventEmitter<string>);
@@ -133,26 +141,14 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     });
   }
 
-  private create(id: string): Promise<void> {
-    return call(this.userChannel, 'open', { id });
-  }
-
-  private async joinChannel(channel: Channel): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      channel
-        .join()
-        .receive('ok', () => {
-          this.roomChannel = channel;
-          resolve();
-        })
-        .receive('error', ({ reason }) => reject(new Error(reason)));
-    });
+  private async create(id: string): Promise<void> {
+    return this.serverConnection?.call('create', { id });
   }
 
   private updateUrl() {
     const url = new URL(location.href);
     // url.searchParams.set('roomId', this.roomId);
-    history.replaceState(history.state, '', url.href);
+    history.replaceState(history.state, document.title, url.href);
   }
 
   private handleJoinError(
@@ -185,7 +181,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
     if (leave) {
       channel.leave();
       // this.channel$.next(null);
-      unlinkEvents(links, channel);
+      // unlinkEvents(links, channel);
     }
     reject(new Error(msg));
   }
