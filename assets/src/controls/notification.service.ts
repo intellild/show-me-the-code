@@ -1,32 +1,43 @@
-import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentType, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { ApplicationRef, Injectable } from '@angular/core';
+import { ApplicationRef, Injectable, InjectionToken, Injector } from '@angular/core';
 import { EventEmitter } from 'eventemitter3';
 import { observable } from 'mobx-angular';
 import { NotificationListComponent } from './notification-list.component';
+import { TextOnlyNotificationComponent } from './text-only-notification.component';
+import { mergeScan } from 'rxjs/operators';
 
-export interface INotificationOptions {
-  text: string;
-  accept?: boolean;
-  reject?: boolean;
-}
+export const NotificationContentMetaToken = new InjectionToken('NotificationContentMetaToken');
 
-export class NotificationRef extends EventEmitter<'accept' | 'reject' | 'clone'> {
-  @observable
-  text = '';
+// export interface INotificationContent<T> {
+//   meta: T | null;
+//   componentRef:
+// }
 
-  @observable
-  accept = false;
+export class NotificationRef<T = unknown, M = unknown> extends EventEmitter<'accept' | 'reject' | 'clone'> {
+  public readonly portal: ComponentPortal<T>;
 
-  @observable
-  reject = false;
-
-  constructor(private readonly notificationService: NotificationService, options: INotificationOptions) {
+  constructor(
+    private readonly notificationService: NotificationService,
+    parentInjector: Injector,
+    component: ComponentType<T>,
+    meta: M,
+  ) {
     super();
-    const { text = '', accept = false, reject = false } = options;
-    this.text = text;
-    this.accept = accept;
-    this.reject = reject;
+    const injector = Injector.create({
+      parent: parentInjector,
+      providers: [
+        {
+          provide: NotificationRef,
+          useValue: this,
+        },
+        {
+          provide: NotificationContentMetaToken,
+          useValue: meta,
+        },
+      ],
+    });
+    this.portal = new ComponentPortal(component, null, injector);
   }
 
   close() {}
@@ -40,11 +51,22 @@ export class NotificationService {
   private readonly containerPortal = new ComponentPortal(NotificationListComponent);
   private overlayRef: OverlayRef | null = null;
 
-  constructor(private readonly overlay: Overlay, private readonly applicationRef: ApplicationRef) {}
+  constructor(
+    private readonly overlay: Overlay,
+    private readonly applicationRef: ApplicationRef,
+    private readonly injector: Injector,
+  ) {}
 
-  push(options: INotificationOptions) {
+  public push(message: string): NotificationRef;
+  public push<T, M>(component: ComponentType<T>, meta: M): NotificationRef;
+  public push<T, M>(component: ComponentType<T> | string, meta?: M): NotificationRef {
     this.ensureContainer();
-    const notification = new NotificationRef(this, options);
+    let notification: NotificationRef;
+    if (typeof component === 'string') {
+      notification = new NotificationRef(this, this.injector, TextOnlyNotificationComponent, component);
+    } else {
+      notification = new NotificationRef(this, this.injector, component, meta);
+    }
     this.list.unshift(notification);
     return notification;
   }
@@ -64,4 +86,6 @@ export class NotificationService {
     requestAnimationFrame(() => this.applicationRef.tick());
     this.overlayRef.updatePosition();
   }
+
+  private pushMessage(message: string) {}
 }

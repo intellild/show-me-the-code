@@ -3,13 +3,7 @@ import { NotificationRef } from './notification.service';
 
 @Component({
   selector: 'app-notification',
-  template: `
-    <div class="message">{{ message }}</div>
-    <div *ngIf="accept && reject" class="action">
-      <app-button>Accept</app-button>
-      <app-button>Reject</app-button>
-    </div>
-  `,
+  template: ` <ng-template [cdkPortalOutlet]="portal"></ng-template> `,
   styles: [
     `
       :host {
@@ -25,16 +19,6 @@ import { NotificationRef } from './notification.service';
       :host:hover {
         background: #2a2d2e;
       }
-
-      .message {
-        margin-right: 10px;
-      }
-
-      .action {
-        margin-top: 10px;
-        display: flex;
-        flex-direction: row-reverse;
-      }
     `,
   ],
 })
@@ -42,15 +26,7 @@ export class NotificationComponent {
   @Input()
   notification: NotificationRef | null = null;
 
-  get message() {
-    return this.notification?.text ?? '';
-  }
-
-  get accept() {
-    return this.notification?.accept ?? false;
-  }
-
-  get reject() {
-    return this.notification?.reject ?? false;
+  public get portal() {
+    return this.notification?.portal;
   }
 }

@@ -28,18 +28,18 @@ export function linkEvents(events: string[], channel: Channel, target: EventEmit
   return links;
 }
 
-declare module 'phoenix' {
-  interface Channel {
-    off(event: string, ref: number): void;
-  }
-}
-
-export function unlinkEvents(links: Record<string, number>, channel: Channel) {
-  Object.keys(links).forEach((event) => {
-    const ref = links[event];
-    channel.off(event, ref);
-  });
-}
+// declare module 'phoenix' {
+//   interface Channel {
+//     off(event: string, ref: number): void;
+//   }
+// }
+//
+// export function unlinkEvents(links: Record<string, number>, channel: Channel) {
+//   Object.keys(links).forEach((event) => {
+//     const ref = links[event];
+//     channel.off(event, ref);
+//   });
+// }
 
 function blob2base64(blob: Blob): Promise<string> {
   return new Promise<string>((resolve) => {

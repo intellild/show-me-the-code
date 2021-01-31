@@ -6,7 +6,7 @@ import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { ITab } from '../controls/tabs.component';
 import { IGist, IGistFile } from '../models';
-import { ConnectionService } from '../services/connection.service';
+import { ConnectionService, JoinState } from '../services/connection.service';
 import { GithubService } from '../services/github.service';
 
 @Component({
@@ -88,18 +88,39 @@ export class ShelfComponent implements AfterViewInit {
       return;
     }
     try {
+      this.spinnerService.open();
       await this.connectionService.open(this.alias);
     } catch (e) {
       console.error(e.message);
+    } finally {
+      this.spinnerService.close();
     }
   }
 
   async join() {
     try {
-      this.spinnerService.open('Requesting');
-      await this.connectionService.requestJoin(this.alias);
+      const state$ = this.connectionService.requestJoin(this.alias);
+      state$.subscribe(
+        (state) => {
+          switch (state) {
+            case JoinState.Connecting:
+              this.spinnerService.open('Connecting');
+              break;
+            case JoinState.WaitingForAccept:
+              this.spinnerService.open('Waiting For Accept');
+              break;
+            case JoinState.Accepted:
+              this.spinnerService.close();
+              break;
+          }
+        },
+        (error) => {
+          this.spinnerService.close();
+          console.error(error);
+        },
+      );
     } catch (e) {
-      console.error(e)
+      console.error(e);
       this.spinnerService.close();
     }
   }

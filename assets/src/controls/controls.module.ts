@@ -20,6 +20,7 @@ import { TabsComponent } from './tabs.component';
 import { TerminalDirective } from './terminal.directive';
 import { DialogComponent } from './dialog.component';
 import { DialogService } from './dialog.service';
+import { TextOnlyNotificationComponent } from "./text-only-notification.component";
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { DialogService } from './dialog.service';
     SpinnerComponent,
     TabsComponent,
     TerminalDirective,
+    TextOnlyNotificationComponent,
   ],
   imports: [BrowserModule, BrowserAnimationsModule, MobxAngularModule, OverlayModule, PortalModule],
   providers: [DialogService, NotificationService, SpinnerService, TerminalService],

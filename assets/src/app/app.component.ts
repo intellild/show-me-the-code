@@ -1,11 +1,11 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { DialogService } from '../controls/dialog.service';
+import { DialogRef, DialogService } from '../controls/dialog.service';
 import { SpinnerService } from '../controls/spinner.service';
 import { ConnectionService, ConnectState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
-import { ShelfComponent } from "./shelf.component";
+import { ShelfComponent } from './shelf.component';
 
 @Component({
   selector: 'app-root',
@@ -45,6 +45,7 @@ import { ShelfComponent } from "./shelf.component";
 })
 export class AppComponent implements AfterViewInit, OnDestroy {
   private readonly $$: Subscription[] = [];
+  private shelfDialog: DialogRef<ShelfComponent> | null = null;
 
   get model() {
     return this.editorService.model;
@@ -67,7 +68,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
             break;
           case ConnectState.LoginSuccess:
             this.spinnerService.close();
-            this.dialogService.open(ShelfComponent);
+            this.shelfDialog = this.dialogService.open(ShelfComponent);
+            break;
+          case ConnectState.JoinSuccess:
+            this.shelfDialog?.close();
+            this.shelfDialog = null;
             break;
           default:
             break;
