@@ -13,22 +13,6 @@
   overflow-y: auto;
   flex: 0 0 200px;
   height: 100%;
-  background-color: rgb(27, 26, 25);
-  color: rgb(243, 242, 241);
-}
-
-.item {
-  height: 42px;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-
-  &.active,
-  &:hover {
-    cursor: pointer;
-    background: rgb(37, 36, 35);
-    color: rgb(243, 242, 241);
-  }
 }
 
 .actions {

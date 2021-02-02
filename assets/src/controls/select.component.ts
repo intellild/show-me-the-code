@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import { observe } from 'mobx';
 import { computed, observable } from 'mobx-angular';
-import { InputComponent } from './input.component';
 
 export interface ISelectOption {
   value: string;
@@ -23,27 +22,22 @@ export interface ISelectOption {
 @Component({
   selector: 'app-select',
   template: `
-    <app-input
+    <fluent-text-field
       #input
       *mobxAutorun
+      class="input"
       [placeholder]="text"
       (focus)="onFocus()"
       (blur)="onBlur()"
       (keydown)="onKeydown($event)"
       [(value)]="keyword"
-    ></app-input>
+    ></fluent-text-field>
     <ng-template #popup>
-      <div *mobxAutorun class="options synthetic-focus" (mouseleave)="active = null">
-        <div
-          *ngFor="let option of items; let index = index; trackBy: optionsTrackBy"
-          class="item"
-          [class.active]="active !== null ? option.value === options[active].value : false"
-          (mouseover)="active = index"
-          (mousedown)="onItemClick($event, option)"
-        >
+      <fluent-listbox *ngIf="items.length > 0" class="options">
+        <fluent-option *ngFor="let option of items; let index = index; trackBy: optionsTrackBy">
           {{ option.text }}
-        </div>
-      </div>
+        </fluent-option>
+      </fluent-listbox>
     </ng-template>
   `,
   styles: [
@@ -53,23 +47,13 @@ export interface ISelectOption {
         overflow: visible;
       }
 
+      .input {
+        width: 100%;
+      }
+
       .options {
         width: 100%;
         box-sizing: border-box;
-        background-color: rgb(60, 60, 60);
-      }
-
-      .item {
-        height: 18px;
-        display: flex;
-        align-items: center;
-        color: rgb(204, 204, 204);
-        padding: 0 5px;
-      }
-
-      .item:hover,
-      .item.active {
-        background-color: #062f4a !important;
       }
     `,
   ],
@@ -78,7 +62,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   private overlayRef: OverlayRef | null = null;
 
   @ViewChild('input')
-  inputRef: InputComponent | null = null;
+  inputRef: any | null = null;
 
   @observable
   active: number | null = null;

@@ -1,28 +1,28 @@
-<div *mobxAutorun class="list synthetic-focus">
-  <div *ngFor="let item of list" class="item" [class.active]="item.id === currentGist?.id" (click)="onGistClick(item)">
+<fluent-listbox *mobxAutorun class="list">
+  <fluent-option *ngFor="let item of list" class="item" [class.active]="item.id === currentGist?.id" (click)="onGistClick(item)">
     {{ item.name }}
-  </div>
-</div>
-<div *mobxAutorun class="list synthetic-focus">
+  </fluent-option>
+</fluent-listbox>
+<fluent-listbox *mobxAutorun class="list">
   <ng-container *ngIf="currentGist !== null">
-    <div *ngFor="let file of currentGist.files" class="item" [class.active]="file === currentFile">
+    <fluent-option *ngFor="let file of currentGist.files" class="item" [class.active]="file === currentFile">
       {{ file.filename }}
-    </div>
+    </fluent-option>
   </ng-container>
-</div>
+</fluent-listbox>
 <div *mobxAutorun class="actions">
-  <app-button (click)="open()">Create Empty</app-button>
-  <app-button>Open Selected File</app-button>
-  <app-button>Create New One From Selected File</app-button>
-  <app-button (click)="join()">Join</app-button>
+  <fluent-button appearance="accent" (click)="open()">Create Empty</fluent-button>
+  <fluent-button appearance="accent">Open Selected File</fluent-button>
+  <fluent-button appearance="accent">Create New One From Selected File</fluent-button>
+  <fluent-button appearance="accent" (click)="join()">Join</fluent-button>
   <div *mobxAutorun class="target">
     <div class="title">
       <label>Alias:</label>
-      <app-input [(value)]="alias"></app-input>
+      <fluent-text-field [(value)]="alias"></fluent-text-field>
     </div>
     <div class="title">
       <label>Target Gist:</label>
-      <app-checkbox class="checkbox" [(value)]="targetCurrentGist">Current Gist</app-checkbox>
+      <fluent-checkbox class="checkbox" [checked]="targetCurrentGist" (change)="onIsCurrentGistChange($event)">Current Gist</fluent-checkbox>
     </div>
     <app-select
       *ngIf="!targetCurrentGist"

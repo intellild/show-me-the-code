@@ -4,7 +4,6 @@ import { computed } from 'mobx-angular';
 import { DialogRef } from '../controls/dialog.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
-import { ITab } from '../controls/tabs.component';
 import { IGist, IGistFile } from '../models';
 import { ConnectionService, JoinState } from '../services/connection.service';
 import { GithubService } from '../services/github.service';
@@ -15,17 +14,6 @@ import { GithubService } from '../services/github.service';
   styleUrls: ['./shelf.component.scss'],
 })
 export class ShelfComponent implements AfterViewInit {
-  readonly tabs: ITab[] = [
-    {
-      key: 'exist',
-      text: 'Exist',
-    },
-    {
-      key: 'new',
-      text: 'New',
-    },
-  ];
-
   @observable
   active = 'exist';
 
@@ -67,7 +55,12 @@ export class ShelfComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit() {
-    // this.loadGists();
+    this.loadGists();
+  }
+
+  onIsCurrentGistChange(e: InputEvent) {
+    this.targetCurrentGist = (e.target as HTMLInputElement).checked;
+    console.log(this.targetCurrentGist)
   }
 
   async loadGists() {

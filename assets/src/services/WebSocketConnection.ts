@@ -51,7 +51,7 @@ export class WebSocketConnection extends EventEmitter<keyof IServerEvents> {
       .receive('error', (error) => {
         this.emit('login:error', error);
       });
-    linkEvents<keyof IServerEvents>([], this.userChannel, this);
+    linkEvents([], this.userChannel, this);
     this.socket.connect();
   }
 
