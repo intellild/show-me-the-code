@@ -32,7 +32,6 @@
     "monaco-editor": "^0.21.2",
     "monaco-editor-webpack-plugin": "^2.0.0",
     "ngx-build-plus": "^11.0.0",
-    "ngx-toastr": "^13.0.0",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
     "prettier": "^2.0.5",
@@ -45,7 +44,7 @@
     "xterm-addon-fit": "^0.4.0",
     "xterm-addon-search": "^0.7.0",
     "xterm-addon-webgl": "^0.9.0",
-    "zone.js": "~0.10.3"
+    "zone.js": "^0.11.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1101.2",

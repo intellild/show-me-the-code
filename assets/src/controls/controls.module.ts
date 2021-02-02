@@ -35,7 +35,4 @@ import { TextOnlyNotificationComponent } from './text-only-notification.componen
   exports: [EditorDirective, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class ControlsModule {
-  // static FluentDesignSystemProvider = FluentDesignSystemProvider;
-  // static FluentButton = FluentButton;
-}
+export class ControlsModule {}

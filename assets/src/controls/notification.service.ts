@@ -40,7 +40,9 @@ export class NotificationRef<T = unknown, M = unknown> extends EventEmitter<'acc
     this.portal = new ComponentPortal(component, null, injector);
   }
 
-  close() {}
+  close() {
+    this.notificationService.remove(this);
+  }
 }
 
 @Injectable()
@@ -69,6 +71,13 @@ export class NotificationService {
     }
     this.list.unshift(notification);
     return notification;
+  }
+
+  remove(ref: NotificationRef) {
+    const index = this.list.indexOf(ref);
+    if (index !== -1) {
+      this.list.splice(index, 1);
+    }
   }
 
   private ensureContainer() {

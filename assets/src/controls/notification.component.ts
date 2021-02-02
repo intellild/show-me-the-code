@@ -8,12 +8,14 @@ import { NotificationRef } from './notification.service';
     `
       :host {
         display: flex;
+        flex-direction: column;
         padding: 10px 5px;
         box-sizing: border-box;
         color: rgb(204, 204, 204);
         background: rgb(37, 37, 38);
         width: 450px;
         box-shadow: rgb(0, 0, 0) 0 0 8px;
+        margin-bottom: 10px;
       }
 
       :host:hover {
@@ -28,5 +30,9 @@ export class NotificationComponent {
 
   public get portal() {
     return this.notification?.portal;
+  }
+
+  close() {
+    this.notification?.close();
   }
 }
