@@ -1,9 +1,9 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { observable } from 'mobx-angular';
 
 @Component({
-  selector: 'preference',
+  selector: 'app-preference',
   template: `
     <div pop [popContent]="popContent" [(popOpen)]="popOpen" (click)="popOpen = true">
       <svg height="24" width="24" viewBox="0 0 24 24">
@@ -12,18 +12,20 @@ import { observable } from 'mobx-angular';
       </svg>
     </div>
     <ng-template #popContent>
-      <div class="container">
-        <label>Language:</label>
-        <app-input></app-input>
-        <label>Language:</label>
-        <app-input></app-input>
-        <label>Language:</label>
-        <app-input></app-input>
-        <label>Language:</label>
-        <app-input></app-input>
-        <label>Language:</label>
-        <app-input></app-input>
-      </div>
+      <fluent-card>
+        <div class="container">
+          <label>Language:</label>
+          <app-input></app-input>
+          <label>Language:</label>
+          <app-input></app-input>
+          <label>Language:</label>
+          <app-input></app-input>
+          <label>Language:</label>
+          <app-input></app-input>
+          <label>Language:</label>
+          <app-input></app-input>
+        </div>
+      </fluent-card>
     </ng-template>
   `,
   styles: [
@@ -71,6 +73,7 @@ import { observable } from 'mobx-angular';
       transition('close => open', [animate('0.3s')]),
     ]),
   ],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class PreferenceComponent {
   @observable

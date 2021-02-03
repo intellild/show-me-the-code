@@ -1,7 +1,7 @@
 import { ApplicationRef, Injectable, Injector } from '@angular/core';
 import { ComponentType, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { DialogComponent, DialogContentToken } from './dialog.component';
+import { DialogComponent, DialogContentToken, DialogStyleToken } from './dialog.component';
 
 export class DialogRef<T> {
   private readonly dialogPortal: ComponentPortal<DialogComponent>;
@@ -10,6 +10,7 @@ export class DialogRef<T> {
     private readonly overlayRef: OverlayRef,
     component: ComponentType<T>,
     serviceInjector: Injector,
+    style?: Record<string, any>,
     parentInjector?: Injector | undefined,
   ) {
     const injector = Injector.create({
@@ -27,6 +28,10 @@ export class DialogRef<T> {
         {
           provide: DialogContentToken,
           useValue: contentPortal,
+        },
+        {
+          provide: DialogStyleToken,
+          useValue: style,
         },
       ],
       parent: serviceInjector,
@@ -56,14 +61,14 @@ export class DialogService {
     private readonly applicationRef: ApplicationRef,
   ) {}
 
-  open<T>(component: ComponentType<T>, injector?: Injector | undefined) {
+  open<T>(component: ComponentType<T>, style?: Record<string, any>, injector?: Injector | undefined) {
     const overlayRef = this.overlay.create(
       new OverlayConfig({
         hasBackdrop: true,
         positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
       }),
     );
-    const dialog = new DialogRef(overlayRef, component, this.injector, injector);
+    const dialog = new DialogRef(overlayRef, component, this.injector, style, injector);
     dialog.open();
     requestAnimationFrame(() => this.applicationRef.tick());
     dialog.updatePosition();

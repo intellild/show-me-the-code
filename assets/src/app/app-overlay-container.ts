@@ -1,14 +1,14 @@
-import { OverlayContainer } from "@angular/cdk/overlay";
-import { Injectable } from "@angular/core";
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { Injectable } from '@angular/core';
 
 /**
  * Whether we're in a testing environment.
  * TODO(crisbeto): remove this once we have an overlay testing module.
  */
-const isTestEnvironment: boolean = typeof window !== 'undefined' && !!window &&
-  !!((window as any).__karma__ || (window as any).jasmine);
+const isTestEnvironment: boolean =
+  typeof window !== 'undefined' && !!window && !!((window as any).__karma__ || (window as any).jasmine);
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AppOverlayContainer extends OverlayContainer {
   /**
    * Create the overlay container element, which is simply a div
@@ -18,9 +18,9 @@ export class AppOverlayContainer extends OverlayContainer {
     const containerClass = 'cdk-overlay-container';
 
     if (this._platform.isBrowser || isTestEnvironment) {
-      const oppositePlatformContainers =
-        this._document.querySelectorAll(`.${containerClass}[platform="server"], ` +
-          `.${containerClass}[platform="test"]`);
+      const oppositePlatformContainers = this._document.querySelectorAll(
+        `.${containerClass}[platform="server"], ` + `.${containerClass}[platform="test"]`,
+      );
 
       // Remove any old containers from the opposite platform.
       // This can happen when transitioning from the server to the client.
@@ -47,7 +47,7 @@ export class AppOverlayContainer extends OverlayContainer {
       container.setAttribute('platform', 'server');
     }
 
-    this._document.getElementById("container")?.appendChild(container);
+    this._document.getElementById('container')?.appendChild(container);
     this._containerElement = container;
   }
 }

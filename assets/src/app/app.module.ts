@@ -4,7 +4,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MobxAngularModule } from 'mobx-angular';
-import { ToastrModule } from 'ngx-toastr';
 import { ControlsModule } from '../controls/controls.module';
 import { CodeService } from '../services/code.service';
 import { ConnectionService } from '../services/connection.service';
@@ -24,7 +23,6 @@ import { ShelfComponent } from './shelf.component';
     BrowserAnimationsModule,
     ControlsModule,
     MobxAngularModule,
-    ToastrModule.forRoot(),
     ScrollingModule,
   ],
   providers: [

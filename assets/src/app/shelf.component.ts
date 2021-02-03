@@ -1,4 +1,4 @@
-import { AfterViewInit, ApplicationRef, Component } from '@angular/core';
+import { AfterViewInit, ApplicationRef, Component, ViewEncapsulation } from '@angular/core';
 import { observable } from 'mobx';
 import { computed } from 'mobx-angular';
 import { DialogRef } from '../controls/dialog.service';
@@ -12,8 +12,13 @@ import { GithubService } from '../services/github.service';
   selector: 'app-shelf',
   templateUrl: './shelf.component.html',
   styleUrls: ['./shelf.component.scss'],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class ShelfComponent implements AfterViewInit {
+  static dialogStyle = {
+    '--dialog-width': '800px',
+  };
+
   @observable
   active = 'exist';
 
@@ -60,7 +65,6 @@ export class ShelfComponent implements AfterViewInit {
 
   onIsCurrentGistChange(e: InputEvent) {
     this.targetCurrentGist = (e.target as HTMLInputElement).checked;
-    console.log(this.targetCurrentGist)
   }
 
   async loadGists() {

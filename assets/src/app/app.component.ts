@@ -11,7 +11,7 @@ import { ShelfComponent } from './shelf.component';
   selector: 'app-root',
   template: `
     <div *mobxAutorun class="toolbar">
-      <preference></preference>
+      <app-preference></app-preference>
     </div>
     <monaco-editor [model]="model"></monaco-editor>
     <app-terminal></app-terminal>
@@ -68,7 +68,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
             break;
           case ConnectState.LoginSuccess:
             this.spinnerService.close();
-            this.shelfDialog = this.dialogService.open(ShelfComponent);
+            this.shelfDialog = this.dialogService.open(ShelfComponent, ShelfComponent.dialogStyle);
             break;
           case ConnectState.JoinSuccess:
             this.shelfDialog?.close();

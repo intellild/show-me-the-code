@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as monaco from 'monaco-editor';
-import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 // import { MessageService } from 'primeng/api';
 import { debounceTime } from 'rxjs/operators';
@@ -47,7 +46,6 @@ export class CodeService {
   constructor(
     private readonly editorService: EditorService,
     private readonly connectionService: ConnectionService,
-    private readonly toastrService: ToastrService,
   ) {
     this.edit$.pipe(debounceTime(10000)).subscribe(() => {
       this.saveSilently();
@@ -90,10 +88,10 @@ export class CodeService {
   save() {
     this.saveSilently().then(
       () => {
-        this.toastrService.info('Save succeed');
+        // this.toastrService.info('Save succeed');
       },
       () => {
-        this.toastrService.error('Save fail');
+        // this.toastrService.error('Save fail');
       },
     );
   }

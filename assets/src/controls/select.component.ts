@@ -10,6 +10,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  ViewEncapsulation,
 } from '@angular/core';
 import { observe } from 'mobx';
 import { computed, observable } from 'mobx-angular';
@@ -57,6 +58,7 @@ export interface ISelectOption {
       }
     `,
   ],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class SelectComponent implements AfterViewInit, OnDestroy {
   private overlayRef: OverlayRef | null = null;

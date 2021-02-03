@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { SpinnerService } from './spinner.service';
 
 @Component({
@@ -21,6 +21,7 @@ import { SpinnerService } from './spinner.service';
       }
     `,
   ],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class SpinnerComponent {
   get text() {
