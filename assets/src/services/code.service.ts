@@ -157,11 +157,11 @@ export class CodeService {
     this.editorService.expires = new Date(expires);
     const expireTime = this.editorService.expires.getTime();
     const now = Date.now();
-    if (expireTime <= now) {
-      this.editorService.expired$.next(true);
-    } else {
-      setTimeout(() => this.editorService.expired$.next(true), expireTime - now);
-    }
+    // if (expireTime <= now) {
+    //   this.editorService.expired$.next(true);
+    // } else {
+    //   setTimeout(() => this.editorService.expired$.next(true), expireTime - now);
+    // }
   }
 
   private onReceiveFullSyncRequest() {

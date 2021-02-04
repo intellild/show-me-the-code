@@ -13,18 +13,13 @@ import { GithubService } from '../services/github.service';
 import { AppOverlayContainer } from './app-overlay-container';
 
 import { AppComponent } from './app.component';
+import { LanguageSelectComponent } from './language-select.component';
 import { PreferenceComponent } from './preference.component';
 import { ShelfComponent } from './shelf.component';
 
 @NgModule({
-  declarations: [AppComponent, ShelfComponent, PreferenceComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    ControlsModule,
-    MobxAngularModule,
-    ScrollingModule,
-  ],
+  declarations: [AppComponent, LanguageSelectComponent, ShelfComponent, PreferenceComponent],
+  imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ScrollingModule],
   providers: [
     CodeService,
     ConnectionService,

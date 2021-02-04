@@ -2,7 +2,7 @@ import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   AfterViewInit,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
@@ -10,7 +10,6 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
-  ViewEncapsulation,
 } from '@angular/core';
 import { observe } from 'mobx';
 import { computed, observable } from 'mobx-angular';
@@ -31,11 +30,19 @@ export interface ISelectOption {
       (focus)="onFocus()"
       (blur)="onBlur()"
       (keydown)="onKeydown($event)"
-      [(value)]="keyword"
-    ></fluent-text-field>
+      [value]="keyword"
+      (input)="keyword = $event.target.value"
+    >
+      {{label}}
+    </fluent-text-field>
     <ng-template #popup>
       <fluent-listbox *ngIf="items.length > 0" class="options">
-        <fluent-option *ngFor="let option of items; let index = index; trackBy: optionsTrackBy">
+        <fluent-option
+          class="item"
+          *ngFor="let option of items; let index = index; trackBy: optionsTrackBy"
+          [selected]="value === option.value"
+          (mousedown)="onItemSelect($event, option)"
+        >
           {{ option.text }}
         </fluent-option>
       </fluent-listbox>
@@ -55,16 +62,22 @@ export interface ISelectOption {
       .options {
         width: 100%;
         box-sizing: border-box;
+        max-height: 200px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .item {
+        flex: 0 0 auto;
       }
     `,
   ],
-  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class SelectComponent implements AfterViewInit, OnDestroy {
   private overlayRef: OverlayRef | null = null;
 
   @ViewChild('input')
-  inputRef: any | null = null;
+  inputRef = new ElementRef<HTMLInputElement | null>(null);
 
   @observable
   active: number | null = null;
@@ -88,8 +101,15 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   @observable
   focused = false;
 
+  @observable
+  @Input()
+  label = '';
+
   @computed
   get text(): string {
+    if (this.focused) {
+      return this.keyword;
+    }
     const value = this.value;
     const option = this.options.find((it) => it.value === value);
     return option?.text ?? '';
@@ -104,10 +124,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     return this.options.filter((it) => it.text.includes(search) || it.value.includes(search));
   }
 
-  private disposers: (() => void)[] = [];
+  private $$: (() => void)[] = [];
 
   constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {
-    this.disposers.push(
+    this.$$.push(
       observe(
         this,
         'value',
@@ -129,8 +149,11 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   }
 
   onBlur() {
-    this.focused = false;
     this.hideOptions();
+    this.focused = false;
+    if (this.inputRef.nativeElement) {
+      this.inputRef.nativeElement.value = this.text;
+    }
   }
 
   showOptions() {
@@ -181,15 +204,16 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  onItemClick(e: MouseEvent, option: ISelectOption) {
+  onItemSelect(e: MouseEvent, option: ISelectOption) {
+    e.stopPropagation();
     e.preventDefault();
     this.valueChange.emit(option.value);
-    this.inputRef?.blur();
+    this.inputRef.nativeElement?.blur();
   }
 
   ngAfterViewInit() {
     this.keyword = this.text;
-    this.disposers.push(
+    this.$$.push(
       observe(this, 'value', () => {
         if (!this.focused) {
           this.keyword = this.text;
@@ -204,6 +228,6 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.disposers.forEach((disposer) => disposer());
+    this.$$.forEach((disposer) => disposer());
   }
 }

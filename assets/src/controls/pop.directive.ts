@@ -29,13 +29,13 @@ export class PopDirective implements AfterViewInit, OnDestroy {
   popOpenChange = new EventEmitter<boolean>();
 
   private overlayRef: OverlayRef | null = null;
-  private disposers: (() => void)[] = [];
+  private $$: (() => void)[] = [];
   private $: Subscription | null = null;
 
   constructor(private readonly viewContainerRef: ViewContainerRef, private readonly overlay: Overlay) {}
 
   ngAfterViewInit(): void {
-    this.disposers.push(
+    this.$$.push(
       observe(this, 'popOpen', () => {
         if (this.popOpen) {
           this.open();
@@ -89,6 +89,6 @@ export class PopDirective implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.close();
-    this.disposers.forEach((disposer) => disposer());
+    this.$$.forEach((disposer) => disposer());
   }
 }

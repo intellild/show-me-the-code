@@ -1,12 +1,23 @@
-import { AfterViewInit, ApplicationRef, Component, ViewEncapsulation } from '@angular/core';
-import { observable } from 'mobx';
-import { computed } from 'mobx-angular';
+import { AfterViewInit, ApplicationRef, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { computed, observable } from 'mobx-angular';
 import { DialogRef } from '../controls/dialog.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { IGist, IGistFile } from '../models';
 import { ConnectionService, JoinState } from '../services/connection.service';
+import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
+
+function omitExtension(filename: string | undefined): string {
+  if (!filename) {
+    return "";
+  }
+  const dot = filename.lastIndexOf('.');
+  if (dot === -1) {
+    return filename;
+  }
+  return filename.substring(0, dot);
+}
 
 @Component({
   selector: 'app-shelf',
@@ -40,6 +51,12 @@ export class ShelfComponent implements AfterViewInit {
   @observable
   alias = '';
 
+  @observable
+  language = this.editorService.language$.getValue();
+
+  @observable
+  filename = '';
+
   @computed
   get targetGistList(): ISelectOption[] {
     return this.list.map((it) => {
@@ -57,6 +74,7 @@ export class ShelfComponent implements AfterViewInit {
     private readonly githubService: GithubService,
     private readonly spinnerService: SpinnerService,
     private readonly connectionService: ConnectionService,
+    private readonly editorService: EditorService,
   ) {}
 
   ngAfterViewInit() {
@@ -78,6 +96,20 @@ export class ShelfComponent implements AfterViewInit {
       this.targetGistId = gist.id;
     }
     this.currentGist = gist;
+  }
+
+  onFileClick(file: IGistFile) {
+
+    if (file.filename) {
+      if (!this.alias || this.alias === omitExtension(this.currentFile?.filename)) {
+        this.alias = omitExtension(file.filename);
+      }
+      if (!this.filename || this.filename === this.currentFile?.filename) {
+        this.filename = file.filename;
+      }
+      this.language = this.editorService.getFileType(file.filename) ?? 'plaintext';
+    }
+    this.currentFile = file;
   }
 
   async open() {

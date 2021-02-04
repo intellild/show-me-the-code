@@ -2,14 +2,16 @@ import { Injectable, OnDestroy } from '@angular/core';
 import * as monaco from 'monaco-editor';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
+import { ISelectOption } from '../controls/select.component';
 
 const THEME_KEY = 'THEME';
 
 @Injectable()
 export class EditorService implements OnDestroy {
+  readonly languageOptions: ISelectOption[];
+  readonly extensions: Map<string, string>;
   readonly language$ = new BehaviorSubject('javascript');
   readonly fontSize$ = new BehaviorSubject(14);
-  readonly expired$ = new BehaviorSubject(false);
   readonly format$ = new Subject();
   readonly theme$: BehaviorSubject<string>;
   expires: Date | null = null;
@@ -29,10 +31,33 @@ export class EditorService implements OnDestroy {
         monaco.editor.setTheme(theme);
       }),
     );
+    const languages = monaco.languages.getLanguages();
+    const extensionMap = new Map<string, string>();
+    this.languageOptions = languages.map(({ id, aliases, extensions }) => {
+      if (extensions) {
+        extensions.forEach((extension) => {
+          extensionMap.set(extension, id);
+        });
+      }
+      return {
+        value: id,
+        text: aliases?.[0] || id,
+      };
+    });
+    this.extensions = extensionMap;
   }
 
   format() {
     this.format$.next();
+  }
+
+  getFileType(filename: string): string | undefined {
+    const dot = filename.lastIndexOf(".");
+    if (dot === -1) {
+      return undefined;
+    }
+    const extension = filename.substring(dot);
+    return this.extensions.get(extension);
   }
 
   ngOnDestroy() {
