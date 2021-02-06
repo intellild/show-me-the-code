@@ -62,6 +62,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     this.$$.push(
       this.connectionService.connectState$.subscribe((state) => {
+        console.log(state)
         switch (state) {
           case ConnectState.Connecting:
             this.spinnerService.open();

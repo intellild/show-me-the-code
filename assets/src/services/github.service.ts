@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Octokit } from '@octokit/rest';
+import { ApolloClient, gql, InMemoryCache } from '@apollo/client/core';
 import * as Cookie from 'cookie';
-import { IGist, IGistFile, IUser } from '../models';
+import { IGist, IUser } from '../models';
+import { ListGists, ListGists_viewer_gists, ListGistsVariables } from './__generated__/ListGists';
+import { User } from './__generated__/User';
 
 export const token = Cookie.parse(document.cookie).github_token;
 
@@ -15,60 +17,75 @@ if (!token) {
 
 @Injectable()
 export class GithubService {
-  private readonly client: Octokit;
+  private readonly client: ApolloClient<unknown>;
   private user: IUser | null = null;
   public readonly token: string;
 
   constructor() {
     this.token = token;
-    this.client = new Octokit({
-      auth: token,
+    this.client = new ApolloClient({
+      uri: 'https://api.github.com/graphql',
+      cache: new InMemoryCache(),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
 
   async getUser(): Promise<IUser> {
     if (!this.user) {
-      const { data, status } = await this.client.users.getAuthenticated();
-      if (status !== 200) {
-        auth();
-        throw new Error('Unauthorized');
+      const query = await this.client.query<User>({
+        query: gql`
+          query User {
+            viewer {
+              id
+              databaseId
+              name
+              avatarUrl
+              url
+              email
+            }
+          }
+        `,
+      });
+      if (!query.error && !query.errors?.length) {
+        this.user = query.data.viewer;
+      } else {
+        throw new Error('error getting user info');
       }
-      this.user = {
-        id: data.id,
-        avatar: data.avatar_url,
-        url: data.html_url,
-        email: data.email,
-        name: data.name,
-      };
     }
     return this.user;
   }
 
-  async getGists(page: number): Promise<IGist[]> {
-    const { data, status } = await this.client.gists.list({
-      per_page: 20,
-      page,
+  async getGists(count: number, from: string | null = null): Promise<ListGists_viewer_gists> {
+    const query = await this.client.query<ListGists, ListGistsVariables>({
+      query: gql`
+        query ListGists($count: Int!, $from: String) {
+          viewer {
+            gists(first: $count, after: $from) {
+              totalCount
+              nodes {
+                id
+                name
+                description
+                files {
+                  name
+                  text
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        count,
+        from,
+      },
     });
-    if (status !== 200) {
-      return [];
+    if (!query.error && !query.errors?.length) {
+      return query.data.viewer.gists;
+    } else {
+      throw new Error('error getting lists');
     }
-    return data.map((gist) => {
-      const { id, description, public: isPublic, created_at, updated_at } = gist;
-      const files: IGistFile[] = Object.values(gist.files).map(({ filename, type, language }) => ({
-        filename,
-        type,
-        language,
-      }));
-      const name = files.length ? files[0].filename : '';
-      return {
-        id,
-        name,
-        isPublic,
-        createdAt: new Date(created_at),
-        updatedAt: new Date(updated_at),
-        description,
-        files,
-      };
-    });
   }
 }

@@ -156,3 +156,4 @@ assets/src/serializers/index.d.ts
 
 .elixir_ls
 config/dev.secret.exs
+__generated__

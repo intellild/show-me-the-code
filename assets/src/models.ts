@@ -1,23 +1,8 @@
-export interface IUser {
-  id: number;
-  avatar: string;
-  url: string;
-  email: string;
-  name: string;
-}
+import { ListGists_viewer_gists_nodes, ListGists_viewer_gists_nodes_files } from "./services/__generated__/ListGists";
+import { User_viewer } from "./services/__generated__/User";
 
-export interface IGist {
-  id: string;
-  name: string | undefined;
-  description: string;
-  files: IGistFile[];
-  isPublic: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export type IGist = ListGists_viewer_gists_nodes;
 
-export interface IGistFile {
-  filename: string | undefined;
-  type: string | undefined;
-  language: string | undefined;
-}
+export type IGistFile = ListGists_viewer_gists_nodes_files;
+
+export type IUser = User_viewer;

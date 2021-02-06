@@ -14,16 +14,7 @@ import { observable } from 'mobx-angular';
     <ng-template #popContent>
       <fluent-card>
         <div class="container">
-          <label>Language:</label>
-          <app-input></app-input>
-          <label>Language:</label>
-          <app-input></app-input>
-          <label>Language:</label>
-          <app-input></app-input>
-          <label>Language:</label>
-          <app-input></app-input>
-          <label>Language:</label>
-          <app-input></app-input>
+          <app-language-select></app-language-select>
         </div>
       </fluent-card>
     </ng-template>
@@ -37,15 +28,7 @@ import { observable } from 'mobx-angular';
 
       .container {
         width: 500px;
-        padding: 10px;
-        display: grid;
-        grid-template-columns: 100px auto;
-        grid-auto-rows: minmax(40px, auto);
-        align-items: center;
-      }
-
-      .container label {
-        padding: 0 10px;
+        margin: 20px;
       }
     `,
   ],

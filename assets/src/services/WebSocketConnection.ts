@@ -17,7 +17,7 @@ export interface IServerEvents {
 }
 
 export interface IServerCall {
-  create: { id: string };
+  open: { id: string };
   'join:request': { id: string };
 }
 
@@ -39,10 +39,11 @@ export class WebSocketConnection extends EventEmitter<keyof IServerEvents> {
 
   constructor(user: IUser) {
     super();
+    console.log(user)
     this.socket.onOpen(() => {
       this.emit('open');
     });
-    this.userChannel = this.socket.channel(`user:${user.id}`);
+    this.userChannel = this.socket.channel(`user:${user.databaseId}`);
     this.userChannel
       .join()
       .receive('ok', () => {

@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import * as EventEmitter from 'eventemitter3';
 import { observable } from 'mobx-angular';
-import { Channel, Socket } from 'phoenix';
+import { Channel } from 'phoenix';
 import { BehaviorSubject } from 'rxjs';
-import { environment } from '../environments/environment';
-import { IUser } from '../models';
-// import { call, unlinkEvents } from '../utils';
-import { GithubService, token } from './github.service';
+import { IUser } from "../models";
+import { GithubService } from './github.service';
 import { WebSocketConnection } from './WebSocketConnection';
 
 export interface ISocketEvents {
@@ -142,7 +140,7 @@ export class ConnectionService extends EventEmitter<keyof ISocketEvents> {
   }
 
   private async create(id: string): Promise<void> {
-    return this.serverConnection?.call('create', { id });
+    return this.serverConnection?.call('open', { id });
   }
 
   private updateUrl() {

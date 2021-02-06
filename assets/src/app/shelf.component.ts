@@ -4,13 +4,14 @@ import { DialogRef } from '../controls/dialog.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { IGist, IGistFile } from '../models';
+import { ListGists_viewer_gists_nodes } from "../services/__generated__/ListGists";
 import { ConnectionService, JoinState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
 
-function omitExtension(filename: string | undefined): string {
+function omitExtension(filename: string | null | undefined): string {
   if (!filename) {
-    return "";
+    return '';
   }
   const dot = filename.lastIndexOf('.');
   if (dot === -1) {
@@ -34,7 +35,10 @@ export class ShelfComponent implements AfterViewInit {
   active = 'exist';
 
   @observable
-  list: IGist[] = [];
+  list: ListGists_viewer_gists_nodes[] = [];
+
+  @observable
+  gistCount = 0;
 
   @observable
   currentGist: IGist | null = null;
@@ -87,7 +91,9 @@ export class ShelfComponent implements AfterViewInit {
 
   async loadGists() {
     this.spinnerService.open();
-    this.list = await this.githubService.getGists(0);
+    const { nodes, totalCount } = await this.githubService.getGists(10);
+    this.list = (nodes ?? []) as IGist[];
+    this.gistCount = totalCount;
     this.spinnerService.close();
   }
 
@@ -99,15 +105,14 @@ export class ShelfComponent implements AfterViewInit {
   }
 
   onFileClick(file: IGistFile) {
-
-    if (file.filename) {
-      if (!this.alias || this.alias === omitExtension(this.currentFile?.filename)) {
-        this.alias = omitExtension(file.filename);
+    if (file.name) {
+      if (!this.alias || this.alias === omitExtension(this.currentFile?.name)) {
+        this.alias = omitExtension(file.name);
       }
-      if (!this.filename || this.filename === this.currentFile?.filename) {
-        this.filename = file.filename;
+      if (!this.filename || this.filename === this.currentFile?.name) {
+        this.filename = file.name;
       }
-      this.language = this.editorService.getFileType(file.filename) ?? 'plaintext';
+      this.language = this.editorService.getFileType(file.name) ?? 'plaintext';
     }
     this.currentFile = file;
   }
