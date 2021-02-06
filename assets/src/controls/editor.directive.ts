@@ -7,9 +7,9 @@ import * as monaco from 'monaco-editor';
   selector: 'monaco-editor',
 })
 export class EditorDirective implements AfterViewInit, OnDestroy {
-  private editor: monaco.editor.IStandaloneCodeEditor | null = null;
   private resizeObserver: ResizeObserver;
   private readonly $$: (() => void)[] = [];
+  instance: monaco.editor.IStandaloneCodeEditor | null = null;
 
   @Input()
   @observable.ref
@@ -17,27 +17,27 @@ export class EditorDirective implements AfterViewInit, OnDestroy {
 
   constructor(private readonly viewContainerRef: ViewContainerRef) {
     this.resizeObserver = new ResizeObserver(() => {
-      this.editor?.layout();
+      this.instance?.layout();
     });
   }
 
   ngAfterViewInit(): void {
     const element = this.viewContainerRef.element.nativeElement;
-    this.editor = monaco.editor.create(element, {
+    this.instance = monaco.editor.create(element, {
       model: this.model,
       theme: 'vs-dark',
     });
     this.resizeObserver.observe(element);
     this.$$.push(
       observe(this, 'model', () => {
-        this.editor?.setModel(this.model);
+        this.instance?.setModel(this.model);
       }),
     );
   }
 
   ngOnDestroy(): void {
-    this.editor?.dispose();
-    this.editor = null;
+    this.instance?.dispose();
+    this.instance = null;
     this.resizeObserver.disconnect();
   }
 }

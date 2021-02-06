@@ -34,7 +34,7 @@ function emptyDecorations(): IUserDecorations {
 }
 
 @Injectable()
-export class CodeService {
+export class CollaborativeService {
   private readonly decorationMap = new Map<string, IUserDecorations>();
   private previousSyncVersionId = 0;
   private readonly edit$ = new Subject<void>();

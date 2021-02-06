@@ -5,7 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MobxAngularModule } from 'mobx-angular';
 import { ControlsModule } from '../controls/controls.module';
-import { CodeService } from '../services/code.service';
+import { CollaborativeService } from '../services/collaborative.service';
 import { ConnectionService } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { TerminalService } from '../services/terminal.service';
@@ -21,7 +21,7 @@ import { ShelfComponent } from './shelf.component';
   declarations: [AppComponent, LanguageSelectComponent, ShelfComponent, PreferenceComponent],
   imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ScrollingModule],
   providers: [
-    CodeService,
+    CollaborativeService,
     ConnectionService,
     EditorService,
     GithubService,

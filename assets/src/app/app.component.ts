@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { DialogRef, DialogService } from '../controls/dialog.service';
+import { EditorDirective } from '../controls/editor.directive';
 import { SpinnerService } from '../controls/spinner.service';
 import { ConnectionService, ConnectState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
@@ -46,6 +47,8 @@ import { ShelfComponent } from './shelf.component';
 export class AppComponent implements AfterViewInit, OnDestroy {
   private readonly $$: Subscription[] = [];
   private shelfDialog: DialogRef<ShelfComponent> | null = null;
+  @ViewChild(EditorDirective)
+  editor: EditorDirective | null = null;
 
   get model() {
     return this.editorService.model;
@@ -62,7 +65,6 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     this.$$.push(
       this.connectionService.connectState$.subscribe((state) => {
-        console.log(state)
         switch (state) {
           case ConnectState.Connecting:
             this.spinnerService.open();
@@ -78,6 +80,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           default:
             break;
         }
+      }),
+      this.editorService.fontSize$.subscribe((fontSize) => {
+        this.editor?.instance?.updateOptions({
+          fontSize,
+        });
       }),
     );
     const user = await this.userService.getUser();
