@@ -25,7 +25,7 @@
     "@angular/router": "~11.1.1",
     "@apollo/client": "^3.3.8",
     "@fluentui/svg-icons": "^1.1.95",
-    "@octokit/rest": "^18.0.6",
+    "@octokit/rest": "^18.1.0",
     "@types/cookie": "^0.4.0",
     "@types/phoenix": "^1.4.4",
     "cookie": "^0.4.1",

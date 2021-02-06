@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApolloClient, gql, InMemoryCache } from '@apollo/client/core';
+import { Octokit } from '@octokit/rest';
 import * as Cookie from 'cookie';
-import { IGist, IUser } from '../models';
+import { IGistFile, IUser } from '../models';
 import { ListGists, ListGists_viewer_gists, ListGistsVariables } from './__generated__/ListGists';
 import { User } from './__generated__/User';
 
@@ -17,24 +18,28 @@ if (!token) {
 
 @Injectable()
 export class GithubService {
-  private readonly client: ApolloClient<unknown>;
+  private readonly graphql: ApolloClient<unknown>;
+  private readonly rest: Octokit;
   private user: IUser | null = null;
   public readonly token: string;
 
   constructor() {
     this.token = token;
-    this.client = new ApolloClient({
+    this.graphql = new ApolloClient({
       uri: 'https://api.github.com/graphql',
       cache: new InMemoryCache(),
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
+    this.rest = new Octokit({
+      auth: token,
+    });
   }
 
   async getUser(): Promise<IUser> {
     if (!this.user) {
-      const query = await this.client.query<User>({
+      const query = await this.graphql.query<User>({
         query: gql`
           query User {
             viewer {
@@ -58,7 +63,7 @@ export class GithubService {
   }
 
   async getGists(count: number, from: string | null = null): Promise<ListGists_viewer_gists> {
-    const query = await this.client.query<ListGists, ListGistsVariables>({
+    const query = await this.graphql.query<ListGists, ListGistsVariables>({
       query: gql`
         query ListGists($count: Int!, $from: String) {
           viewer {
@@ -86,6 +91,33 @@ export class GithubService {
       return query.data.viewer.gists;
     } else {
       throw new Error('error getting lists');
+    }
+  }
+
+  async saveFile(gist_id: string, file: IGistFile) {
+    if (!file.name || !file.text) {
+      throw new Error();
+    }
+    const request = await this.rest.gists.get({
+      gist_id,
+    });
+    if (request.status !== 200) {
+      throw new Error();
+    }
+    const gist = request.data;
+    const save = await this.rest.gists.update({
+      gist_id,
+      files: {
+        ...gist.files,
+        [file.name]: {
+          ...gist.files?.[file.name],
+          filename: file.name,
+          content: file.text,
+        },
+      },
+    });
+    if (save.status !== 200) {
+      throw new Error();
     }
   }
 }

@@ -1,16 +1,11 @@
-import {
-  AfterViewInit,
-  ApplicationRef,
-  Component,
-  ViewEncapsulation
-} from '@angular/core';
+import { AfterViewInit, ApplicationRef, Component, ViewEncapsulation } from '@angular/core';
 import { computed, observable } from 'mobx-angular';
-import * as monaco from "monaco-editor";
+import * as monaco from 'monaco-editor';
 import { DialogRef } from '../controls/dialog.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { IGist, IGistFile } from '../models';
-import { ListGists_viewer_gists_nodes } from '../services/__generated__/ListGists';
+import { CollaborationService } from '../services/collaboration.service';
 import { ConnectionService, JoinState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
@@ -52,7 +47,7 @@ export class ShelfComponent implements AfterViewInit {
   active = 'exist';
 
   @observable
-  list: ListGists_viewer_gists_nodes[] = [];
+  list: IGist[] = [];
 
   @observable
   gistCount = 0;
@@ -90,12 +85,11 @@ export class ShelfComponent implements AfterViewInit {
   }
 
   constructor(
-    private readonly applicationRef: ApplicationRef,
-    private readonly dialogRef: DialogRef<ShelfComponent>,
     private readonly githubService: GithubService,
     private readonly spinnerService: SpinnerService,
     private readonly connectionService: ConnectionService,
     private readonly editorService: EditorService,
+    private readonly collaborationService: CollaborationService,
   ) {}
 
   ngAfterViewInit() {
@@ -139,12 +133,18 @@ export class ShelfComponent implements AfterViewInit {
   }
 
   async open() {
-    if (!this.alias) {
+    if (!this.alias || !this.currentGist?.id) {
       return;
     }
     try {
       this.spinnerService.open();
       await this.connectionService.open(this.alias);
+      this.collaborationService.room = {
+        filename: this.filename,
+        gistId: this.currentGist?.id,
+        alias: this.alias,
+      };
+      this.editorService.language$.next(this.language);
     } catch (e) {
       console.error(e.message);
     } finally {
@@ -191,7 +191,7 @@ export class ShelfComponent implements AfterViewInit {
     }
     let extension = getExtension(this.filename);
     if (!extension) {
-      const language = monaco.languages.getLanguages().find(it => it.id === this.language);
+      const language = monaco.languages.getLanguages().find((it) => it.id === this.language);
       if (language?.extensions?.length) {
         extension = language.extensions[0];
       }

@@ -33,11 +33,19 @@ function emptyDecorations(): IUserDecorations {
   };
 }
 
+export interface IRoom {
+  alias: string;
+  gistId: string;
+  filename: string;
+}
+
 @Injectable()
-export class CollaborativeService {
+export class CollaborationService {
   private readonly decorationMap = new Map<string, IUserDecorations>();
   private previousSyncVersionId = 0;
   private readonly edit$ = new Subject<void>();
+
+  room: IRoom | null = null;
 
   get model() {
     return this.editorService.model;
