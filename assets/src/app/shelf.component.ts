@@ -1,13 +1,30 @@
-import { AfterViewInit, ApplicationRef, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  ApplicationRef,
+  Component,
+  ViewEncapsulation
+} from '@angular/core';
 import { computed, observable } from 'mobx-angular';
+import * as monaco from "monaco-editor";
 import { DialogRef } from '../controls/dialog.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { IGist, IGistFile } from '../models';
-import { ListGists_viewer_gists_nodes } from "../services/__generated__/ListGists";
+import { ListGists_viewer_gists_nodes } from '../services/__generated__/ListGists';
 import { ConnectionService, JoinState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
+
+function getExtension(filename: string | null | undefined): string {
+  if (!filename) {
+    return '';
+  }
+  const dot = filename.lastIndexOf('.');
+  if (dot === -1) {
+    return '';
+  }
+  return filename.substring(dot);
+}
 
 function omitExtension(filename: string | null | undefined): string {
   if (!filename) {
@@ -117,6 +134,10 @@ export class ShelfComponent implements AfterViewInit {
     this.currentFile = file;
   }
 
+  getGistName(gist: IGist) {
+    return gist.files?.[0]?.name ?? gist.name;
+  }
+
   async open() {
     if (!this.alias) {
       return;
@@ -134,7 +155,7 @@ export class ShelfComponent implements AfterViewInit {
   async join() {
     try {
       const state$ = this.connectionService.requestJoin(this.alias);
-      state$.subscribe(
+      const subscription = state$.subscribe(
         (state) => {
           switch (state) {
             case JoinState.Connecting:
@@ -147,15 +168,34 @@ export class ShelfComponent implements AfterViewInit {
               this.spinnerService.close();
               break;
           }
+          subscription.unsubscribe();
         },
         (error) => {
           this.spinnerService.close();
           console.error(error);
+          subscription.unsubscribe();
         },
       );
     } catch (e) {
       console.error(e);
       this.spinnerService.close();
     }
+  }
+
+  onAliasChange(value: string) {
+    const prevAlias = this.alias;
+    const prevFileName = omitExtension(this.filename);
+    this.alias = value;
+    if (prevAlias !== prevFileName) {
+      return;
+    }
+    let extension = getExtension(this.filename);
+    if (!extension) {
+      const language = monaco.languages.getLanguages().find(it => it.id === this.language);
+      if (language?.extensions?.length) {
+        extension = language.extensions[0];
+      }
+    }
+    this.filename = `${value}${extension}`;
   }
 }

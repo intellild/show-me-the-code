@@ -1,12 +1,12 @@
 <fluent-listbox *mobxAutorun class="list">
   <fluent-option *ngFor="let item of list" [actived]="item.id === currentGist?.id" (click)="onGistClick(item)">
-    {{ item.name }}
+    {{ getGistName(item) }}
   </fluent-option>
 </fluent-listbox>
 <fluent-listbox *mobxAutorun class="list">
   <ng-container *ngIf="currentGist !== null">
     <fluent-option *ngFor="let file of currentGist.files" [actived]="file === currentFile" (click)="onFileClick(file)">
-      {{ file.filename }}
+      {{ file.name }}
     </fluent-option>
   </ng-container>
 </fluent-listbox>
@@ -16,7 +16,7 @@
   <fluent-button appearance="accent">Create New One From Selected File</fluent-button>
   <fluent-button appearance="accent" (click)="join()">Join</fluent-button>
   <div *mobxAutorun>
-    <fluent-text-field [value]="alias" (input)="alias = $event.target.value">Alias:</fluent-text-field>
+    <fluent-text-field [value]="alias" (input)="onAliasChange($event.target.value)">Alias:</fluent-text-field>
   </div>
   <div *mobxAutorun>
     <fluent-text-field [value]="filename" (input)="filename = $event.target.value">Filename:</fluent-text-field>

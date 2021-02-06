@@ -1,9 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { observable } from 'mobx-angular';
-import * as monaco from 'monaco-editor';
 import { EditorService } from '../services/editor.service';
-
-console.log(monaco.languages.getLanguages());
 
 @Component({
   selector: 'app-language-select',
