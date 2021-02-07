@@ -11,9 +11,8 @@
   </ng-container>
 </fluent-listbox>
 <div *mobxAutorun class="actions">
-  <fluent-button appearance="accent" (click)="open()">Create Empty</fluent-button>
-  <fluent-button appearance="accent">Open Selected File</fluent-button>
-  <fluent-button appearance="accent">Create New One From Selected File</fluent-button>
+  <fluent-button appearance="accent" (click)="openEmpty()">Create Empty</fluent-button>
+  <fluent-button appearance="accent" (click)="open()">Open Selected File</fluent-button>
   <fluent-button appearance="accent" (click)="join()">Join</fluent-button>
   <div *mobxAutorun>
     <fluent-text-field [value]="alias" (input)="onAliasChange($event.target.value)">Alias:</fluent-text-field>

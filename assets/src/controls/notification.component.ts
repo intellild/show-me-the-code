@@ -12,7 +12,7 @@ import { NotificationRef } from './notification.service';
     `
       :host {
         box-sizing: border-box;
-        width: 450px;
+        width: 100%;
         margin-bottom: 10px;
       }
 

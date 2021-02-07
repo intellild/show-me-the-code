@@ -12,8 +12,10 @@ import { animate, stagger, style, transition, trigger } from '@angular/animation
   styles: [
     `
       :host {
-        width: 450px;
+        width: 350px;
         overflow: visible;
+        display: flex;
+        flex-direction: column;
       }
     `,
   ],

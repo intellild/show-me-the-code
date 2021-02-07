@@ -1,33 +1,22 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewEncapsulation } from '@angular/core';
 import { NotificationContentMetaToken, NotificationRef } from './notification.service';
 
 @Component({
   selector: 'app-text-only-notification',
   template: `
-    <div class="container">
-      <div class="content">
+    <div>
 
-      </div>
-      <div class="close">
-
-      </div>
     </div>
   `,
   styles: [
     `
-      .container {
+      :host {
         display: flex;
+        width: 100%;
       }
-
-      .content {
-        flex: 1 1 100%;
-      }
-
-      .close {
-        flex: 0 0 30px;
-      }
-    `
-  ]
+    `,
+  ],
+  encapsulation: ViewEncapsulation.ShadowDom,
 })
 export class TextOnlyNotificationComponent {
   constructor(@Inject(NotificationContentMetaToken) public content: string, notificationRef: NotificationRef) {}

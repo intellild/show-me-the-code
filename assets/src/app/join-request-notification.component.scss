@@ -1,0 +1,37 @@
+:host {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  display: grid;
+  grid-template:
+    'avatar content content content' 1fr
+    'avatar padding reject accept' auto;
+  grid-template-columns: 48px 1fr auto auto;
+  gap: 5px;
+}
+
+.avatar {
+  grid-area: avatar;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-position: center;
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+fluent-button {
+  --base-height-multiplier: 6;
+}
+
+.content {
+  grid-area: content;
+}
+
+.reject {
+  grid-area: reject;
+}
+
+.accept {
+  grid-area: accept;
+}

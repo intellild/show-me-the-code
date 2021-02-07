@@ -11,21 +11,3 @@ app-root {
   width: 100vw;
   height: 100vh;
 }
-
-.monaco-workbench {
-  color: #ccc;
-}
-
-.transparent {
-  background: transparent;
-}
-
-.synthetic-focus {
-  outline: rgba(14, 99, 156, 0.8) solid 1px;
-  outline-offset: -1px;
-}
-
-.pop {
-  background-color: rgb(37, 36, 35);
-  box-shadow: rgba(0, 0, 0, 0.133) 0 6.4px 14.4px 0, rgba(0, 0, 0, 0.11) 0 1.2px 3.6px 0;
-}

@@ -88,7 +88,7 @@ export class NotificationService {
       new OverlayConfig({
         hasBackdrop: false,
         panelClass: '',
-        positionStrategy: this.overlay.position().global().right('0').bottom('0'),
+        positionStrategy: this.overlay.position().global().right('0').top('0').bottom('0'),
       }),
     );
     this.overlayRef.attach(this.containerPortal);

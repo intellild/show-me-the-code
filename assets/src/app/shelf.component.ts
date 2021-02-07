@@ -1,7 +1,7 @@
 import { AfterViewInit, ApplicationRef, Component, ViewEncapsulation } from '@angular/core';
 import { computed, observable } from 'mobx-angular';
 import * as monaco from 'monaco-editor';
-import { DialogRef } from '../controls/dialog.service';
+import { NotificationService } from '../controls/notification.service';
 import { ISelectOption } from '../controls/select.component';
 import { SpinnerService } from '../controls/spinner.service';
 import { IGist, IGistFile } from '../models';
@@ -9,6 +9,7 @@ import { CollaborationService } from '../services/collaboration.service';
 import { ConnectionService, JoinState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
+import { IJoinRequest, JoinRequestNotificationComponent } from './join-request-notification.component';
 
 function getExtension(filename: string | null | undefined): string {
   if (!filename) {
@@ -90,6 +91,7 @@ export class ShelfComponent implements AfterViewInit {
     private readonly connectionService: ConnectionService,
     private readonly editorService: EditorService,
     private readonly collaborationService: CollaborationService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   ngAfterViewInit() {
@@ -132,7 +134,7 @@ export class ShelfComponent implements AfterViewInit {
     return gist.files?.[0]?.name ?? gist.name;
   }
 
-  async open() {
+  async openEmpty() {
     if (!this.alias || !this.currentGist?.id) {
       return;
     }
@@ -150,6 +152,12 @@ export class ShelfComponent implements AfterViewInit {
     } finally {
       this.spinnerService.close();
     }
+  }
+
+  async open() {
+    this.notificationService.push<JoinRequestNotificationComponent, IJoinRequest>(JoinRequestNotificationComponent, {
+      userLogin: 'intellild'
+    });
   }
 
   async join() {
