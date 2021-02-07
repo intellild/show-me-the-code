@@ -32,7 +32,17 @@ import { TextOnlyNotificationComponent } from './text-only-notification.componen
   ],
   imports: [BrowserModule, BrowserAnimationsModule, MobxAngularModule, OverlayModule, PortalModule],
   providers: [DialogService, NotificationService, SpinnerService, TerminalService],
-  exports: [EditorDirective, PopDirective, SelectComponent, SpinnerComponent, TerminalDirective],
+  exports: [
+    DialogComponent,
+    EditorDirective,
+    NotificationComponent,
+    NotificationListComponent,
+    PopDirective,
+    SelectComponent,
+    SpinnerComponent,
+    TerminalDirective,
+    TextOnlyNotificationComponent,
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ControlsModule {}

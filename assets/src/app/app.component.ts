@@ -1,8 +1,10 @@
 import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+import { observable } from 'mobx-angular';
 import { Subscription } from 'rxjs';
 import { DialogRef, DialogService } from '../controls/dialog.service';
 import { EditorDirective } from '../controls/editor.directive';
 import { SpinnerService } from '../controls/spinner.service';
+import { IUser } from '../models';
 import { ConnectionService, ConnectState } from '../services/connection.service';
 import { EditorService } from '../services/editor.service';
 import { GithubService } from '../services/github.service';
@@ -13,6 +15,7 @@ import { ShelfComponent } from './shelf.component';
   template: `
     <div *mobxAutorun class="toolbar">
       <app-preference></app-preference>
+      <app-persona [user]="user"></app-persona>
     </div>
     <monaco-editor [model]="model"></monaco-editor>
     <app-terminal></app-terminal>
@@ -32,6 +35,7 @@ import { ShelfComponent } from './shelf.component';
         color: #fff;
         display: flex;
         align-items: center;
+        padding: 0 20px;
       }
 
       monaco-editor {
@@ -49,6 +53,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   private shelfDialog: DialogRef<ShelfComponent> | null = null;
   @ViewChild(EditorDirective)
   editor: EditorDirective | null = null;
+
+  @observable
+  user: IUser | null = null;
 
   get model() {
     return this.editorService.model;
@@ -87,8 +94,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
         });
       }),
     );
-    const user = await this.userService.getUser();
-    this.connectionService.connect(user);
+    this.user = await this.userService.getUser();
+    this.connectionService.connect(this.user);
   }
 
   ngOnDestroy() {

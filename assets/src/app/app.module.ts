@@ -14,11 +14,12 @@ import { AppOverlayContainer } from './app-overlay-container';
 
 import { AppComponent } from './app.component';
 import { LanguageSelectComponent } from './language-select.component';
+import { PersonaComponent } from './persona.component';
 import { PreferenceComponent } from './preference.component';
 import { ShelfComponent } from './shelf.component';
 
 @NgModule({
-  declarations: [AppComponent, LanguageSelectComponent, ShelfComponent, PreferenceComponent],
+  declarations: [AppComponent, LanguageSelectComponent, ShelfComponent, PersonaComponent, PreferenceComponent],
   imports: [BrowserModule, BrowserAnimationsModule, ControlsModule, MobxAngularModule, ScrollingModule],
   providers: [
     CollaborationService,

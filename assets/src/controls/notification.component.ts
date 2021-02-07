@@ -3,23 +3,26 @@ import { NotificationRef } from './notification.service';
 
 @Component({
   selector: 'app-notification',
-  template: ` <ng-template [cdkPortalOutlet]="portal"></ng-template> `,
+  template: `
+    <fluent-card class="container">
+      <ng-template [cdkPortalOutlet]="portal"></ng-template>
+    </fluent-card>
+  `,
   styles: [
     `
       :host {
-        display: flex;
-        flex-direction: column;
-        padding: 10px 5px;
         box-sizing: border-box;
-        color: rgb(204, 204, 204);
-        background: rgb(37, 37, 38);
         width: 450px;
-        box-shadow: rgb(0, 0, 0) 0 0 8px;
         margin-bottom: 10px;
       }
 
       :host:hover {
         background: #2a2d2e;
+      }
+
+      .container {
+        display: flex;
+        width: 100%;
       }
     `,
   ],

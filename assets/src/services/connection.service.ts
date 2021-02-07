@@ -3,7 +3,7 @@ import * as EventEmitter from 'eventemitter3';
 import { observable } from 'mobx-angular';
 import { Channel } from 'phoenix';
 import { BehaviorSubject } from 'rxjs';
-import { IUser } from "../models";
+import { IUser } from '../models';
 import { GithubService } from './github.service';
 import { WebSocketConnection } from './WebSocketConnection';
 

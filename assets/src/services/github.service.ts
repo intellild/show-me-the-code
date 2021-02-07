@@ -94,19 +94,19 @@ export class GithubService {
     }
   }
 
-  async saveFile(gist_id: string, file: IGistFile) {
+  async saveFile(id: string, file: IGistFile) {
     if (!file.name || !file.text) {
       throw new Error();
     }
     const request = await this.rest.gists.get({
-      gist_id,
+      gist_id: id,
     });
     if (request.status !== 200) {
       throw new Error();
     }
     const gist = request.data;
     const save = await this.rest.gists.update({
-      gist_id,
+      gist_id: id,
       files: {
         ...gist.files,
         [file.name]: {
